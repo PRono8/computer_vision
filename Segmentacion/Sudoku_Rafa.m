@@ -1,4 +1,161 @@
+%% Pruebas MATLAB 2
+close all
+clear
+clc
+
+%% Load Image
+frame = imread('Sudoku3.jpeg');
+figure(1)
+subplot(1,4,1)
+imshow(frame)
+title('Sudoku')
+
+%% Preprocesado
+
+% Mask
+img = rgb2gray(frame);
+imb =  imbinarize(img,'adaptive','Sensitivity',0.7);
+BW = abs(imb-1);
+subplot(1,4,2)
+imshow(BW)
+title('Binarizado')
+
+% Apply a skeleton morphology to get the thinnest lines
+BMSkel = bwmorph(BW,'skel',1);
+subplot(1,4,3)
+imshow(BMSkel)
+title('Skeletonized Lines')
+
+BMDil = bwmorph(BMSkel,'dilate',0);
+subplot(1,4,4)
+imshow(BMDil)
+title('Skeletonized Lines')
+
+im_processing = BMDil;
+
+%% Rotación
+[H,T,R] = hough(im_processing);
+% Se extrae el mayor pico
+P  = houghpeaks(H,1);
+% Se obtiene la posición del pico
+x = T(P(:,2));
+% Se obtiene el ángulo del pico
+ang = mean(mean(x));
+% Se rota la imagen
+impr = imrotate(im_processing,ang);
+imr = imrotate(frame,ang);
+
+figure
+subplot(1,2,1)
+imshow(impr)
+subplot(1,2,2)
+imshow(imr)
+
+rotI = imr;
+BW = impr;
+
+%% Detect Lines
+[H,T,R] = hough(BW);
+
+P  = houghpeaks(H,10,'threshold',ceil(0.3*max(H(:))));
+x = T(P(:,2));
+y = R(P(:,1));
+
+L = [x;y]';
+
+lines = houghlines(BW,T,R,P,'FillGap',5,'MinLength',7);
+
+figure
+imshow(rotI), 
+hold on 
+
+max_len = 0; 
+for k = 1:length(lines)    
+    xy = [lines(k).point1; lines(k).point2];    
+    plot(xy(:,1),xy(:,2),'LineWidth',2,'Color','green');
+    
+    % Plot beginnings and ends of lines    
+    plot(xy(1,1),xy(1,2),'x','LineWidth',2,'Color','yellow');    
+    plot(xy(2,1),xy(2,2),'x','LineWidth',2,'Color','red');     % Determine the endpoints of the longest line segment    
+    len = norm(lines(k).point1 - lines(k).point2);    
+    if ( len > max_len)       
+        max_len = len;       
+        xy_long = xy;    
+    end 
+end
+plot(xy_long(:,1),xy_long(:,2),'LineWidth',2,'Color','cyan');
+
+
+%% Pruebas MATLAB Github
+close all
+clear
+clc
+
+%% Load Image
+frame = imread('Sudoku3.jpeg');
+figure(1)
+subplot(1,4,1)
+imshow(frame)
+title('Sudoku')
+
+%% Preprocesado
+
+% Mask
+img = rgb2gray(frame);
+imb = imbinarize(img,'adaptive','Sensitivity',0.7);
+BW = abs(imb-1);
+subplot(1,4,2)
+imshow(BW)
+title('Binarizado')
+
+% % Apply a close morphology to make continuous lines
+% BM = imclose(BW,strel('disk',3));
+% subplot(1,4,3)
+% imshow(BM)
+% title('Continuous Lines')
+
+% Apply a skeleton morphology to get the thinnest lines
+BMSkel = bwmorph(BW,'skel',inf);
+subplot(1,4,3)
+imshow(BMSkel)
+title('Skeletonized Lines')
+
+BMDil = bwmorph(BMSkel,'dilate',1);
+subplot(1,4,4)
+imshow(BMDil)
+title('Skeletonized Lines')
+
+%% Detect Lines
+% Perform Hough Transform
+[H,T,R] = hough(BMDil);
+
+% Identify Peaks in Hough Transform
+hPeaks =  houghpeaks(H,4,'NHoodSize',[55 11]);
+
+% Extract lines from hough transform and peaks
+hLines = houghlines(BMDil,T,R,hPeaks,...
+        'FillGap',100,'MinLength',100);
+
+%% View results
+% Overlay lines
+[linePos,markerPos] = getVizPosArray(hLines);
+
+lineFrame = insertShape(frame,'Line',linePos,...
+            'Color','blue','LineWidth',5);
+outFrame = insertObjectAnnotation(lineFrame,...
+            'circle',markerPos,'','Color','yellow','LineWidth',5);
+
+% View image
+figure(5)
+imshow(outFrame)
+title('Detected Lines')
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Práctica
+
 %% Ejercicio 13
 clear all
 %close all
