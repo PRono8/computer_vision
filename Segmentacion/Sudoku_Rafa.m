@@ -1,3 +1,238 @@
+%% CÓDIGO PEPE
+
+% Deteccion de entorno
+close all;
+clear all;
+
+%% Parámetros
+open = 1000; % Eliminación de objetos pequeños
+min_area = 20; % Eliminación de objetos pequeños
+
+%% Preprocesado
+% Lectura de imagen
+im1 = imread('Sudoku2.jpeg');
+
+    figure(1)
+    subplot(1,5,1)
+    imshow(im1)
+    title('Imagen original')
+
+% Binariazación usando el método de Otsu
+Ibw = ~im2bw(im1,graythresh(im1));
+    subplot(1,5,2)
+    imshow(Ibw)
+    title('Imagen Binarizada')
+
+%% Procesado
+% Rellena los huecos
+Ifill = imfill(Ibw,'holes');
+    subplot(1,5,3)
+    imshow(Ifill)
+    title('Imagen rellena')
+
+% Elimina los objetos pequeños
+Iarea = bwareaopen(Ifill,open);
+    subplot(1,5,4)
+    imshow(Iarea)
+    title('Imagen sin objetos pequeños')
+
+% Etiqueta las regiones conectadas 
+Ifinal = bwlabel(Iarea);
+    subplot(1,5,5)
+    imshow(Ifinal,[])
+    colormap(gca,[0,0,0;colorcube])
+    title('Regiones conectadas')
+
+n_etiquetas = max(max(Ifinal));
+
+%% Identificación
+
+% Imagen binarizada, rellena, de cerco convexo y su área
+prop_im1 = regionprops(Ifinal,'Image','ConvexImage','Area');
+
+% Muestra la signatura de cada objeto
+figure
+cont = 1;
+
+%save('signatura_cuadrado.mat','signatura_referencia')
+load('signatura_cuadrado.mat','signatura_referencia')
+
+for k = 1:numel(prop_im1)
+    % Elimina areas pequeñas
+    if (prop_im1(k).Area > min_area)
+        subplot(numel(prop_im1),3,cont)
+        imshow(prop_im1(k).Image);
+        subplot(numel(prop_im1),3,cont+1)
+        imshow(prop_im1(k).ConvexImage);
+        subplot(numel(prop_im1),3,cont+2)
+        % Cálculo de la signatura normalizada
+        signatura = signatura_isa(prop_im1(k).ConvexImage);
+        plot(signatura(:,1),signatura(:,2));
+        cont=cont+3;
+        
+        windowSize = 100; 
+        b = (1/windowSize)*ones(1,windowSize);
+        a = 1;
+        y = filter(b,a,signatura(:,2));
+        pk = findpeaks(y);
+        picos = find(pk > 0.9);
+        nun_picos = size(picos);
+        picos = nun_picos(1)
+        
+        
+%         tam = size(signatura(:,2));
+%         %[pks,locs] = findpeaks(signatura(:,2))
+%         pk = findpeaks(signatura(:,2),'MinPeakDistance',tam(1)/10);
+%         picos = find(pk > 0.8);
+%         nun_picos = size(picos);
+%         picos = nun_picos(1)
+        
+        % [pks,locs]
+         % 'MinPeakProminence',0.2
+        
+        
+%        % Hasta pi/4
+%         tam1 = size(signatura(:,1));
+%         tam2 = size(signatura(:,2));
+%         pi_cuartos = signatura([1:tam1/4],1);
+%         valor = signatura([1:tam2/4],2);
+%         plot(pi_cuartos,valor);
+        
+    end
+end
+
+
+
+
+
+
+%% 
+% Área de cada region y su posición (esquina superior izquierda)
+stat = regionprops(Ifinal,'boundingbox','Area');
+
+
+for cnt = 1 : numel(stat)
+    if(stat(cnt).Area > 100000 && stat(cnt).Area < 600000)
+        bb = stat(cnt).BoundingBox
+        rectangle('position',bb,'edgecolor','r','linewidth',2);
+        %I_grey  = rgb2gray(Ifinal);
+        
+        %p = [min(y), min(x), max(y)-min(y) , max(x)-min(x)]; % coordenadas rectÃ¡ngulo
+        im_ob = imcrop(im1,bb); %subimagen con un Ãºnico objeto en niveles de grises
+        figure;
+        imshow(im_ob,[]);
+        
+        im_ob = rgb2gray(im_ob);
+        
+        BW = edge(im_ob,'canny');
+
+        [H,theta,rho] = hough(BW);
+
+        peak = houghpeaks(H,1);
+        barAngle = theta(peak(:,2));
+        ang = mean(mean(barAngle));
+
+        rotI = imrotate(im1,ang,'crop');
+        BW = imrotate(BW,ang);
+
+        figure,
+        imshow(rotI);
+
+        figure,
+        imshow(BW);
+        
+        Ibw = ~im2bw(rotI,graythresh(rotI));
+        Ifill = imfill(Ibw,'holes');
+        figure;
+        imshow(Ifill);
+        Iarea = bwareaopen(Ifill,10000);
+        figure;
+        imshow(Iarea);
+        Ifinal = bwlabel(Iarea);
+        figure;
+        imshow(Ifinal);
+        stat2 = regionprops(Ifinal,'boundingbox','Area');
+        figure;
+        imshow(rotI); hold on;
+        for cnt2 = 1 : numel(stat2)
+            if(stat2(cnt2).Area > 300000 && stat2(cnt2).Area < 6000000)
+                bb2 = stat2(cnt2).BoundingBox
+                rectangle('position',bb2,'edgecolor','r','linewidth',2);
+                
+                im_ob = imcrop(rotI,bb2); %subimagen con un Ãºnico objeto en niveles de grises
+                figure;
+                imshow(im_ob,[]);
+
+                im_ob = rgb2gray(im_ob);
+
+                BW = edge(im_ob,'canny');
+                figure('Name', 'Canny objeto'),
+                imshow(BW);
+                [H,T,R] = hough(BW); 
+                imshow(H,[],'XData',T,'YData',R,'InitialMagnification','fit'); 
+                xlabel('\theta'), ylabel('\rho'); axis on, axis normal, hold on;
+
+                P  = houghpeaks(H,1000000,'threshold',ceil(0.3*max(H(:)))); x = T(P(:,2)); y = R(P(:,1)); plot(x,y,'s','color','white');
+
+                lines = houghlines(BW,T,R,P,'FillGap',1000000,'MinLength',10); 
+                figure, 
+                imshow(BW), 
+                hold on 
+                max_len = 0; 
+                for k = 1:length(lines)    
+                    xy = [lines(k).point1; lines(k).point2];    
+                    plot(xy(:,1),xy(:,2),'LineWidth',2,'Color','green');   
+                    % Plot beginnings and ends of lines    
+                    plot(xy(1,1),xy(1,2),'x','LineWidth',2,'Color','yellow');    
+                    plot(xy(2,1),xy(2,2),'x','LineWidth',2,'Color','red');     
+                    % Determine the endpoints of the longest line segment    
+                    len = norm(lines(k).point1 - lines(k).point2);    
+                    if ( len > max_len)       
+                        max_len = len;       
+                        xy_long = xy;    
+                    end
+                end
+            end
+        end
+    end
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Pruebas MATLAB 2
 close all
 clear
