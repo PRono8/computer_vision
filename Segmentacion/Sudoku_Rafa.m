@@ -6,12 +6,11 @@ clear all;
 
 %% Parámetros
 open = 1000; % Eliminación de objetos pequeños
-min_area = 20; % Eliminación de objetos pequeños
+min_area = 10000; % Eliminación de objetos pequeños
 
 %% Preprocesado
 % Lectura de imagen
-im1 = imread('Sudoku2.jpeg');
-
+im1 = imread('Sudoku3.jpeg');
     figure(1)
     subplot(1,5,1)
     imshow(im1)
@@ -56,21 +55,30 @@ cont = 1;
 cont2 = 1;
 
 %save('signatura_cuadrado.mat','signatura_referencia')
-load('signatura_cuadrado.mat','signatura_referencia')
+%load('signatura_cuadrado.mat','signatura_referencia')
 
+cuadrados = [];
 for k = 1:numel(prop_im1)
-    % Elimina areas pequeñas
+    % Elimina areas pequeÃ±as
     if (prop_im1(k).Area > min_area)
+        % Dibuja
         subplot(numel(prop_im1),3,cont)
         imshow(prop_im1(k).Image);
+        title('Región');
         subplot(numel(prop_im1),3,cont+1)
         imshow(prop_im1(k).ConvexImage);
+        title('Cerco convexo');
         subplot(numel(prop_im1),3,cont+2)
-        % Cálculo de la signatura normalizada
+        
+        % Calculo de la signatura normalizada
         signatura = signatura_isa(prop_im1(k).ConvexImage);
         plot(signatura(:,1),signatura(:,2));
+        title('Signatura');
         cont=cont+3;
         
+        % Calculo de mínimos y máximos
+        % Se divide el ángulo de la signatura en 6 trozos y se calcula, los
+        % máximos superiores a 0.92 y mínimos inferiores a 0.07
         num_picos = 0;
         num_picosmin = 0;
         tam = size(signatura(:,1));
@@ -79,10 +87,10 @@ for k = 1:numel(prop_im1)
             x = [(i*tam2+1):(i*tam2+tam2)];
             maximo = max(signatura(x,2));
             minimo = min(signatura(x,2));
-            if(maximo > 0.95)
+            if(maximo > 0.87)
                 num_picos = num_picos + 1;
             end    
-            if(minimo < 0.05)
+            if(minimo < 0.07)
                 num_picosmin = num_picosmin + 1;
             end  
         end
@@ -90,6 +98,7 @@ for k = 1:numel(prop_im1)
         num_picos;
         num_picosmin;
         
+        % Si tiene 4 mínimo y 4 máximos es un cuadrado y se guarda
         if(num_picos == 4 && num_picosmin == 4)
             cuadrados(cont2) = k;
             cont2 = cont2+1;
@@ -97,7 +106,49 @@ for k = 1:numel(prop_im1)
     end
 end
 
+% Variable con k = cuadrados
 cuadrados
+
+% Se segmenta la región cuadrada de la original (Solo para que se vea)
+ImCuadrado = (Ifinal == cuadrados);
+ImSudoku(:,:,1) = double(im1(:,:,1)) .* (ImCuadrado);
+ImSudoku(:,:,2) = double(im1(:,:,2)) .* (ImCuadrado);
+ImSudoku(:,:,3) = double(im1(:,:,3)) .* (ImCuadrado);
+ImSudoku = ImSudoku/255;
+ImSudoku = 1-abs(ImSudoku);
+
+% Se segementa la región cuadrada de la binarizada
+ImSudokub(:,:,1) = double(Ibw(:,:)) .* (ImCuadrado);
+
+figure
+subplot(1,4,1)
+imshow(ImSudoku)
+title('Sudoku segmentado');
+subplot(1,4,2)
+% Se rotan
+ImH = hough(ImSudokub);
+p = houghpeaks(ImH,1);
+ang = mean(p(:,2));
+ImR = imrotate(ImSudoku,ang);
+ImRb = imrotate(ImSudokub,ang);
+imshow(ImR)
+title('Sudoku rotado');
+subplot(1,4,3)
+imshow(ImRb)
+title('Sudoku rotado y binarizado');
+
+% Se recorta
+[rows, columns] = find(ImRb);
+row1 = min(rows);
+row2 = max(rows);
+col1 = min(columns);
+col2 = max(columns);
+Sudoku = ImR(row1:row2, col1:col2); % Crop image.
+subplot(1,4,4)
+imshow(Sudoku)
+title('Recortado');
+
+
 
 %% 
 % Área de cada region y su posición (esquina superior izquierda)
