@@ -53,7 +53,6 @@ prop_im1 = regionprops(Ifinal,'Image','ConvexImage','Area');
 % Muestra la signatura de cada objeto
 figure
 cont = 1;
-cont2 = 1;
 
 %save('signatura_cuadrado.mat','signatura_referencia')
 load('signatura_cuadrado.mat','signatura_referencia')
@@ -72,36 +71,57 @@ for k = 1:numel(prop_im1)
         cont=cont+3;
         
         num_picos = 0;
-        num_picosmin = 0;
         tam = size(signatura(:,1));
-        tam2 = floor(tam(1)/6);
-        for i = 0:5
-            x = [(i*tam2+1):(i*tam2+tam2)];
+        for i = 0:6
+            x = [(i*tam(2)/6+1):(i*tam(2)/6+tam(2)/6+1)];
             maximo = max(signatura(x,2));
-            minimo = min(signatura(x,2));
-            if(maximo > 0.95)
+            if(maximo > 0.9)
                 num_picos = num_picos + 1;
             end    
-            if(minimo < 0.05)
-                num_picosmin = num_picosmin + 1;
-            end  
         end
         
-        num_picos;
-        num_picosmin;
+        num_picos
         
-        if(num_picos == 4 && num_picosmin == 4)
-            cuadrados(cont2) = k;
-            cont2 = cont2+1;
-        end
+%         windowSize = 100; 
+%         b = (1/windowSize)*ones(1,windowSize);
+%         a = 1;
+%         y = filter(b,a,signatura(:,2));
+%         pk = findpeaks(y);
+%         picos = find(pk > 0.9);
+%         nun_picos = size(picos);
+%         picos = nun_picos(1)
+        
+        
+%         tam = size(signatura(:,2));
+%         %[pks,locs] = findpeaks(signatura(:,2))
+%         pk = findpeaks(signatura(:,2),'MinPeakDistance',tam(1)/10);
+%         picos = find(pk > 0.8);
+%         nun_picos = size(picos);
+%         picos = nun_picos(1)
+        
+        % [pks,locs]
+         % 'MinPeakProminence',0.2
+        
+        
+%        % Hasta pi/4
+%         tam1 = size(signatura(:,1));
+%         tam2 = size(signatura(:,2));
+%         pi_cuartos = signatura([1:tam1/4],1);
+%         valor = signatura([1:tam2/4],2);
+%         plot(pi_cuartos,valor);
+        
     end
 end
 
-cuadrados
+
+
+
+
 
 %% 
 % Área de cada region y su posición (esquina superior izquierda)
 stat = regionprops(Ifinal,'boundingbox','Area');
+
 
 for cnt = 1 : numel(stat)
     if(stat(cnt).Area > 100000 && stat(cnt).Area < 600000)
@@ -208,34 +228,8 @@ end
 
 
 
-%%
-%         windowSize = 100; 
-%         b = (1/windowSize)*ones(1,windowSize);
-%         a = 1;
-%         y = filter(b,a,signatura(:,2));
-%         pk = findpeaks(y);
-%         picos = find(pk > 0.9);
-%         nun_picos = size(picos);
-%         picos = nun_picos(1)
-        
-        
-%         tam = size(signatura(:,2));
-%         %[pks,locs] = findpeaks(signatura(:,2))
-%         pk = findpeaks(signatura(:,2),'MinPeakDistance',tam(1)/10);
-%         picos = find(pk > 0.8);
-%         nun_picos = size(picos);
-%         picos = nun_picos(1)
-        
-        % [pks,locs]
-         % 'MinPeakProminence',0.2
-        
-        
-%        % Hasta pi/4
-%         tam1 = size(signatura(:,1));
-%         tam2 = size(signatura(:,2));
-%         pi_cuartos = signatura([1:tam1/4],1);
-%         valor = signatura([1:tam2/4],2);
-%         plot(pi_cuartos,valor);
+
+
 
 
 
