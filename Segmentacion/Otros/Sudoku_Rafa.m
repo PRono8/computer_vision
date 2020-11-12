@@ -1,3 +1,7 @@
+image = imread('Sudoku2.jpeg');
+[square,num_square] = find_squares(image);
+
+
 %% CÓDIGO PEPE
 
 % Deteccion de entorno
@@ -7,10 +11,12 @@ clear all;
 %% Parámetros
 open = 1000; % Eliminación de objetos pequeños
 min_area = 10000; % Eliminación de objetos pequeños
+u_max = 0.87;
+u_min = 0.2;
 
 %% Preprocesado
 % Lectura de imagen
-im1 = imread('Sudoku3.jpeg');
+im1 = imread('Sudoku2.jpeg');
     figure(1)
     subplot(1,5,1)
     imshow(im1)
@@ -71,35 +77,38 @@ for k = 1:numel(prop_im1)
         subplot(numel(prop_im1),3,cont+2)
         
         % Calculo de la signatura normalizada
-        signatura = signatura_isa(prop_im1(k).ConvexImage);
-        plot(signatura(:,1),signatura(:,2));
-        title('Signatura');
+        [sig_ang,sig_valor] = signatura_isa(prop_im1(k).ConvexImage);
+
+        % Calculo de máximos:
+        cortes_sup = find(sig_valor >= u_max);
+        tam = size(cortes_sup)-1;
+        num_maximos = 1;
+        for i=1:tam(1)
+            if((cortes_sup(i+1) - cortes_sup(i)) > 10)
+                num_maximos = num_maximos + 1;
+            end
+        end   
+        
+        % Calculo de mínimos:
+        cortes_inf = find(sig_valor <= u_min);
+        tam = size(cortes_inf)-1;
+        num_minimos = 1;
+        for i=1:tam(1)
+            if((cortes_inf(i+1) - cortes_inf(i)) > 10)
+                num_minimos = num_minimos + 1;
+            end
+        end  
+        
+        % Dibuja la signatura
+%         k
+%         num_maximos
+%         num_minimos
+        plot(sig_ang,sig_valor);
+        title(sprintf('Signatura: Nmax = %d y Nmin = %d', num_maximos,num_minimos));
         cont=cont+3;
         
-        % Calculo de mínimos y máximos
-        % Se divide el ángulo de la signatura en 6 trozos y se calcula, los
-        % máximos superiores a 0.92 y mínimos inferiores a 0.07
-        num_picos = 0;
-        num_picosmin = 0;
-        tam = size(signatura(:,1));
-        tam2 = floor(tam(1)/6);
-        for i = 0:5
-            x = [(i*tam2+1):(i*tam2+tam2)];
-            maximo = max(signatura(x,2));
-            minimo = min(signatura(x,2));
-            if(maximo > 0.87)
-                num_picos = num_picos + 1;
-            end    
-            if(minimo < 0.07)
-                num_picosmin = num_picosmin + 1;
-            end  
-        end
-        
-        num_picos;
-        num_picosmin;
-        
-        % Si tiene 4 mínimo y 4 máximos es un cuadrado y se guarda
-        if(num_picos == 4 && num_picosmin == 4)
+        % Si tiene 4 mínimo y 5 máximos es un cuadrado y se guarda
+        if(num_maximos == 5 && num_minimos == 4)
             cuadrados(cont2) = k;
             cont2 = cont2+1;
         end
