@@ -4,52 +4,66 @@ function [square,num_square] = find_squares(image)
     open = 1000;        % Elimite small objects
     min_area = 10000;   % Elimite small objects
     u_max = 0.87;       % Maximum threshold 
-    u_min = 0.2;        % Minimum threshold 
+    u_min = 0.2;        % Minimum threshold
+    
+    display1 = 1;
+    display2 = 1;
+    display3 = 1;
 
     %% Preprocessed
-    % Show the image
-        figure('NumberTitle', 'off', 'Name', 'Preprocessed');
-        subplot(1,5,1)
-        imshow(image);
-        title('Original image');
 
     % Binarization using the Otsu method
     Ibw = ~im2bw(image,graythresh(image));
-        subplot(1,5,2)
-        imshow(Ibw)
-        title('Binarized Image')
 
     %% Image processing
     % Fill in the holes
     Ifill = imfill(Ibw,'holes');
-        subplot(1,5,3)
-        imshow(Ifill)
-        title('Fill image')
 
     % Elimite small objects
     Iarea = bwareaopen(Ifill,open);
-        subplot(1,5,4)
-        imshow(Iarea)
-        title('Image without small objects')
+
 
     % Label connected regions
     Iprocessed= bwlabel(Iarea);
+
+    % DISPLAY
+    if(display == 1)
+        figure('NumberTitle', 'off', 'Name', 'Preprocessed');
+        subplot(1,5,1)
+        imshow(image);
+        title('Original image');
+        
+        subplot(1,5,2)
+        imshow(Ibw)
+        title('Binarized Image')
+        
+        subplot(1,5,3)
+        imshow(Ifill)
+        title('Fill image')
+        
+        subplot(1,5,4)
+        imshow(Iarea)
+        title('Image without small objects')
+        
         subplot(1,5,5)
         imshow(Iprocessed,[])
         colormap(gca,[0,0,0;colorcube])
         title('Connected regions')
-
-%    n_label = max(max(Iprocessed));
-
+    end
+    
     %% Identification
 
     % Binarized, filled with convex image and its area
     prop_im1 = regionprops(Iprocessed,'Image','ConvexImage','Area');
 
-    % Show the signature of each object
-    figure('NumberTitle', 'off', 'Name', 'Signatures');
-    cont = 1;   % Auxiliary variables to display
-    cont2 = 1;  % Auxiliary variables to display
+    % DISPLAY
+    if(display2 == 1)
+        % Show the signature of each object
+        figure('NumberTitle', 'off', 'Name', 'Signatures');
+        cont = 1;   % Auxiliary variables to display
+    end   
+    
+    cont2 = 1;  % Auxiliary variables to count number of sudokus
 
     square = [];
     IndSquare = [];
@@ -58,15 +72,6 @@ function [square,num_square] = find_squares(image)
         % Elimite small areas
         if (prop_im1(k).Area > min_area)
             
-            % Show the process
-            subplot(numel(prop_im1),3,cont)
-            imshow(prop_im1(k).Image);
-            title('Region');
-            subplot(numel(prop_im1),3,cont+1)
-            imshow(prop_im1(k).ConvexImage);
-            title('Convex image');
-            subplot(numel(prop_im1),3,cont+2)
-
             % Calculation of the normalized signature
             [sig_ang,sig_val] = signature(prop_im1(k).ConvexImage);
 
@@ -90,11 +95,22 @@ function [square,num_square] = find_squares(image)
                 end
             end  
 
-            % Show the signature
-            plot(sig_ang,sig_val);
-            title(sprintf('Signature: Nmax = %d y Nmin = %d', n_maximum,n_minimum));
-            cont=cont+3;
-
+            % DISPLAY
+            if(display2 == 1)
+                % Show the process
+                subplot(numel(prop_im1),3,cont)
+                imshow(prop_im1(k).Image);
+                title('Region');
+                subplot(numel(prop_im1),3,cont+1)
+                imshow(prop_im1(k).ConvexImage);
+                title('Convex image');
+                subplot(numel(prop_im1),3,cont+2)
+                % Show the signature
+                plot(sig_ang,sig_val);
+                title(sprintf('Signature: Nmax = %d y Nmin = %d', n_maximum,n_minimum));
+                cont=cont+3;
+            end
+            
             % If it has 4 minimum and 5 maximum it is a square and it is saved
             if(n_maximum == 5 && n_minimum == 4)
                 IndSquare(cont2) = k;
@@ -122,24 +138,13 @@ function [square,num_square] = find_squares(image)
             % The square region of the binarized is segmented
             ImSudokub(:,:,1) = double(Ibw(:,:)) .* (ImSquare);
 
-            % Display
-                figure('NumberTitle', 'off', 'Name', 'Result');
-                subplot(1,4,1)
-                imshow(ImSudoku)
-                title('Sudoku segmented');
-
             % They rotate
             ImH = hough(ImSudokub);
             p = houghpeaks(ImH,1);
             ang = mean(p(:,2));
             ImR  = imrotate(ImSudoku,ang);
             ImRb = imrotate(ImSudokub,ang);
-                subplot(1,4,2)
-                imshow(ImR)
-                title('Sudoku rotate');
-                subplot(1,4,3)
-                imshow(ImRb)
-                title('Sudoku rotate and binarized');
+
 
             % Extraction
             [rows, columns] = find(ImRb);
@@ -148,11 +153,27 @@ function [square,num_square] = find_squares(image)
             col1 = min(columns);
             col2 = max(columns);
             Sudoku = ImR(row1:row2, col1:col2); % Crop image.
+
+            square(:,:,k) = Sudoku;
+           
+            % DISPLAY
+            if(display3 == 1)
+                figure('NumberTitle', 'off', 'Name', 'Result');
+                subplot(1,4,1)
+                imshow(ImSudoku)
+                title('Sudoku segmented');
+                
+                subplot(1,4,2)
+                imshow(ImR)
+                title('Sudoku rotate');
+                
+                subplot(1,4,3)
+                imshow(ImRb)
+                title('Sudoku rotate and binarized');
+                
                 subplot(1,4,4)
                 imshow(Sudoku)
-                title('Extracted');
-
-           square(:,:,k) = Sudoku;
+                title('Extracted');    
         end
     end
 end
