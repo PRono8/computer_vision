@@ -27,7 +27,7 @@ function [square,num_square] = find_squares(image)
     Iprocessed= bwlabel(Iarea);
 
     % DISPLAY
-    if(display == 1)
+    if(display1 == 1)
         figure('NumberTitle', 'off', 'Name', 'Preprocessed');
         subplot(1,5,1)
         imshow(image);
