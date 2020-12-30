@@ -3,17 +3,18 @@ function [square,num_square] = find_squares(image)
     %% Parameters
     open = 1000;        % Elimite small objects
     min_area = 10000;   % Elimite small objects
-    u_max = 0.87;       % Maximum threshold 
+    u_max = 0.8;       % Maximum threshold 
     u_min = 0.2;        % Minimum threshold
     
-    display1 = 1;
-    display2 = 1;
+    display1 = 0;
+    display2 = 0;
     display3 = 1;
 
     %% Preprocessed
 
-    % Binarization using the Otsu method
-    Ibw = ~im2bw(image,graythresh(image));
+    % Binarization using the Otsu method (adaptative)
+    ImGRay = 255-rgb2gray(image);
+    Ibw = imbinarize(ImGRay,'adaptive');
 
     %% Image processing
     % Fill in the holes
