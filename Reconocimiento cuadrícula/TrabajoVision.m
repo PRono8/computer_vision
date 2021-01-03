@@ -38,6 +38,8 @@ resultado = regiongrow(imGray,semilla,50);
 resultadoNot = ~resultado;
 % imshow(resultadoNot)
 % rn = regionprops(resultadoNot,'all');   
+
+
 %% Extracción de la imagen directamente (ordenador)
 prueba = ~im1;
 % imshow(prueba)
@@ -64,6 +66,8 @@ for j = 1 : length(cuadros)
 %         imshow(recorte);
     end
 end
+
+
 %% Búsqueda de cada casilla de forma teórica (cualquiera)
 % Obtenemos las medidas de cada cuadro sabiendo sobre lo que trabajamos
 [n,m] = size(imGray);

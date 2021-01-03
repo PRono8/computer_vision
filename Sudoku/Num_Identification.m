@@ -3,8 +3,9 @@ function [n] = Num_Identification(im, mostrar)
 
     imh = histeq(im);                       % Mejora el contraste mediante la ecualización del histograma
     imbw = im2bw(imh,0.2);                  % Convertir imagen a imagen binaria, basada en umbral
-    imf = not(imbw);                        % Inviwerte (para tener números en blanco)
-
+    %imf = not(imbw);                        % Inviwerte (para tener números en blanco)
+    imf = imbw;
+    
     im1 = bwmorph(imf,'erode',4);           % Hace una erosión
     im2 = bwmorph(im1,'dilate',4);          % 4 dilataciones
 
@@ -31,7 +32,7 @@ function [n] = Num_Identification(im, mostrar)
 
 
     X_pf = Cen(1)-Pfc(1);                   % Posición relativa en Y del primer punto final respecto al centroide
-    v = [Euler, Pf, Area, X_pf ]
+    v = [Euler, Pf, Area, X_pf ];
 
     n = 0;
     switch (v(1))                           % Separa (8), (0,6,9,4) y (1,2,3,5,7)
