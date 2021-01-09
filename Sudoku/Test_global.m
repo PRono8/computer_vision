@@ -22,3 +22,10 @@ for i=1:3
         end
     end
 end
+
+
+
+close all
+clear all
+clc
+image = imread('Sudoku1.jpeg');
