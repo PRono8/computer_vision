@@ -16,13 +16,21 @@ im2 = imdilate(BW2,se);
 %% 
 %transformacion de hough
 [H,T,R] = hough(im2);
+figure,
+imshow(im2);
 %busqueda de peaks
+% P  = houghpeaks(H,20,'threshold',ceil(0.3*max(H(:)))); x = T(P(:,2)); y = R(P(:,1)); 
 P  = houghpeaks(H,20,'threshold',ceil(0.3*max(H(:)))); x = T(P(:,2)); y = R(P(:,1)); 
 %busqueda de lineas
-lines = houghlines(im2,T,R,P,'FillGap',600,'MinLength',700);
+lines = houghlines(im2,T,R,P,'FillGap',fill,'MinLength',minlength);
 %buscamos bordes que esten en los extremos y los eliminamos
 margen=80;
 cont=1;
+% if (~isempty(lines))
+%     figure,
+%     imshow(im2);
+%     error('No se han detectado lineas');
+% end
 for i=1:length(lines)
     %borde izquierdo
     if lines(i).point1(1)<=margen && lines(i).point2(1)<=margen

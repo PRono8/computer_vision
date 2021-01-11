@@ -8,9 +8,12 @@ function [n,rotado] = Num_Identification(im, rotar, mostrar)
     %         3 -> 180º = invertido
 
     % rotar: Si es necesario comprobar la rot del núm
-    %         0 -> No
-    %         1 -> Si
-    %         2 -> Ya rotado 90º (puede estar invertido)
+    %         0 -> Si, es necesario comprobar la rot del núm
+    %         1 -> No es necesario comprobar
+    %         2 -> Se debe rotar 90º (puede estar invertido)
+    %         3 -> Se debe rotar 180º
+    %         4 -> Se debe rotar 90º (ya comprobado que no está invertido)
+    %         5 -> Se debe rotar -90º (ya comprobado que no está invertido)
 
     % Mostrar: si se deben mostrar los resultados (plots)
     %         0 -> No
@@ -18,12 +21,21 @@ function [n,rotado] = Num_Identification(im, rotar, mostrar)
     
     rotado = 0;                             % Inicializamos a cero y sobreescribiremos
     n = 0;
-
+    
+%%%%%% ROTAR IMAGEN %%%%%%%%%%
+    if rotar == 2 || rotar == 4
+        im = imrotate(im,90);
+    elseif rotar == 3
+        im = imrotate(im,180);
+    elseif rotar == 5
+        im = imrotate(im,-90);
+    end
+    
 %%%%%% PROPERTIES OBTENCION %%%%%%%
 
-    imh = histeq(im);                       % Mejora el contraste mediante la ecualización del histograma
-    imbw = im2bw(imh,0.2);                  % Convertir imagen a imagen binaria, basada en umbral
-    imf = not(imbw);                        % Inviwerte (para tener números en blanco)
+%     imh = histeq(im);                       % Mejora el contraste mediante la ecualización del histograma
+%     imbw = im2bw(imh,0.2);                  % Convertir imagen a imagen binaria, basada en umbral
+    imf = not(im);                        % Inviwerte (para tener números en blanco)
 
     im1 = bwmorph(imf,'erode',4);           % Hace una erosión
     im2 = bwmorph(im1,'dilate',4);          % 4 dilataciones
@@ -107,7 +119,7 @@ function [n,rotado] = Num_Identification(im, rotar, mostrar)
       text(10,20,num2str(n),'Color','r','BackgroundColor','g');
     end
     
-    if rotar == 1
+    if rotar == 0 && n ~= 0
         BBox = regionprops(esqueleto,'BoundingBox');
         ancho = BBox.BoundingBox(3);
         alto  = BBox.BoundingBox(4); 

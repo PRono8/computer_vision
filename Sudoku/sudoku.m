@@ -12,7 +12,10 @@ function [MSudokus,num_MSudokus] = sudoku(image)
         MSudoku = zeros(9,9);
         
         % Función casillas (Marta y Jorge)
-        [squares,num_squares] = find_squares(ImSudokus(k).Image);
+        %[squares,num_squares] = find_cells(ImSudokus(k).Image);
+        img = imcomplement(ImSudokus(k).Image);
+        squares = find_cells(img);
+        num_squares = length(squares);
         
         % Gestionar error si num_squares != 81
         if(num_squares ~= 81)
@@ -21,13 +24,13 @@ function [MSudokus,num_MSudokus] = sudoku(image)
         end
         
         % Detectar números (Mario)
-        MaSudoku = get_numbers(squares);
+        MaSudoku = get_numbers(squares,num_squares);
         
         % Se guarda en la estructura
         MSudokus(k).Matrix = MaSudoku;
         
         % Número de Sudokus analizados
-        num_MSudokus = sudokus+1;
+        num_MSudokus = num_sudokus+1;
     end
 end
 
@@ -42,51 +45,51 @@ end
 
 
 %% Detectar números (Mario)
-        %Dentro de la función:
-        fila = 1;
-        columna = 1;
-        % Control orientación vertical y horizontal
-        % ...
-        rotado = 0;
-        MCodigos = zeros(9);
-        % Si están todas las casillas
-        if(num_squares == 81)
-            % Por cada una:
-            for i=1:num_squares
-                % Por cada fila
-                if(mod(i,9)==0)
-                    columna = 1;
-                    fila = fila+1;
-                end
-                if(MCodigos == 1)
-                    continue
-                end
-                
-                numero = funcion_Jorge(square(i).Image);
-                
-                if(numero == 0)
-                    MSudoku(fila,columna) = 0;
-                else
-                    % square con imagen de la casilla
-                    [num,rotado] = detect_number(square(i).Image,rotado);
-                    
-                    if(rotado == 1)
-                        % Control orientación en función del número
-                        [MSudoku,MCodigos] = control_rot(MSudoku);
-                        i = 1;
-                    else
-                        MSudoku(fila,columna) = num;
-                    end
-                columna = columna+1; % Siguiente columna
-            end
-        else
-            % Código de error
-        end
-
-function MSudokuG = control_rot(MSudoku)
-    MSudokuG = MSudoku';
-
-end
+%         %Dentro de la función:
+%         fila = 1;
+%         columna = 1;
+%         % Control orientación vertical y horizontal
+%         % ...
+%         rotado = 0;
+%         MCodigos = zeros(9);
+%         % Si están todas las casillas
+%         if(num_squares == 81)
+%             % Por cada una:
+%             for i=1:num_squares
+%                 % Por cada fila
+%                 if(mod(i,9)==0)
+%                     columna = 1;
+%                     fila = fila+1;
+%                 end
+%                 if(MCodigos == 1)
+%                     continue
+%                 end
+%                 
+%                 numero = funcion_Jorge(square(i).Image);
+%                 
+%                 if(numero == 0)
+%                     MSudoku(fila,columna) = 0;
+%                 else
+%                     % square con imagen de la casilla
+%                     [num,rotado] = detect_number(square(i).Image,rotado);
+%                     
+%                     if(rotado == 1)
+%                         % Control orientación en función del número
+%                         [MSudoku,MCodigos] = control_rot(MSudoku);
+%                         i = 1;
+%                     else
+%                         MSudoku(fila,columna) = num;
+%                     end
+%                 columna = columna+1; % Siguiente columna
+%             end
+%         else
+%             % Código de error
+%         end
+% 
+% function MSudokuG = control_rot(MSudoku)
+%     MSudokuG = MSudoku';
+% 
+% end
     
 
 
