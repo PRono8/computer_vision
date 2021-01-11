@@ -68,11 +68,12 @@ function [squares,num_squares] = find_squares(image)
 
     square = [];
     IndSquare = [];
+    aux_display = [];
     for k = 1:numel(prop_im1)
         
         % Elimite small areas
         if (prop_im1(k).Area > min_area)
-            
+            aux_display = [aux_display k];
             % Calculation of the normalized signature
             [sig_ang,sig_val] = signature(prop_im1(k).ConvexImage);
 
@@ -95,28 +96,52 @@ function [squares,num_squares] = find_squares(image)
                     n_minimum = n_minimum + 1;
                 end
             end  
-
-            % DISPLAY
-            if(display2 == 1)
-                % Show the process
-                subplot(numel(prop_im1),3,cont)
-                imshow(prop_im1(k).Image);
-                title('Region');
-                subplot(numel(prop_im1),3,cont+1)
-                imshow(prop_im1(k).ConvexImage);
-                title('Convex image');
-                subplot(numel(prop_im1),3,cont+2)
-                % Show the signature
-                plot(sig_ang,sig_val);
-                title(sprintf('Signature: Nmax = %d y Nmin = %d', n_maximum,n_minimum));
-                cont=cont+3;        
-            end
             
             % If it has 4 minimum and 5 maximum it is a square and it is saved
             if(n_maximum == 5 && n_minimum == 4)
                 IndSquare(num_squares+1) = k;
                 num_squares = num_squares+1;
             end
+        end
+    end
+    
+    % DISPLAY
+    if(length(aux_display) > 0 && display2 == 1)
+        for i=1:length(aux_display)
+            % Show the process
+            subplot(length(aux_display),3,cont)
+            imshow(prop_im1(aux_display(i)).Image);
+            title('Region');
+            subplot(length(aux_display),3,cont+1)
+            imshow(prop_im1(aux_display(i)).ConvexImage);
+            title('Convex image');
+            subplot(length(aux_display),3,cont+2)
+            % Show the signature
+                % Calculation of the normalized signature
+                [sig_ang,sig_val] = signature(prop_im1(aux_display(i)).ConvexImage);
+
+                % Calculation of maximums:
+                up_cut = find(sig_val >= u_max);
+                sz = size(up_cut)-1;
+                n_maximum = 1;
+                for i=1:sz(1)
+                    if((up_cut(i+1) - up_cut(i)) > 10)
+                        n_maximum = n_maximum + 1;
+                    end
+                end   
+
+                % Calculation of minimums:
+                bottom_cut = find(sig_val <= u_min);
+                sz = size(bottom_cut)-1;
+                n_minimum = 1;
+                for i=1:sz(1)
+                    if((bottom_cut(i+1) - bottom_cut(i)) > 10)
+                        n_minimum = n_minimum + 1;
+                    end
+                end  
+            plot(sig_ang,sig_val);
+            title(sprintf('Signature: Nmax = %d y Nmin = %d', n_maximum,n_minimum));
+            cont=cont+3;  
         end
     end
 

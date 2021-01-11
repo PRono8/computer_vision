@@ -3,7 +3,7 @@ close all
 clear all
 clc
 % 6(3),  
-image = imread('Sudoku7.jpeg');
+image = imread('Sudoku6.jpeg');
 find_squares(image);
 
 display_final = 1;
