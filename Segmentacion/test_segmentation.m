@@ -2,10 +2,11 @@
 close all
 clear all
 clc
+% 6(3),  
+image = imread('Sudoku7.jpeg');
+find_squares(image);
 
 display_final = 1;
-
-
 for i=1:8
     s1 = string("image");
     s2 = string(i);

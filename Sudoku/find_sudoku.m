@@ -136,7 +136,16 @@ function [squares,num_squares] = find_sudoku(image)
         % They rotate
         ImH = hough(ImSudokub);
         p = houghpeaks(ImH,1);
-        ang = mean(p(:,2));
+        ang = p(:,2);
+
+        % Wrap angle
+        if(ang >= 170)
+            ang = ang - 180;
+        elseif(ang >= 90)
+            ang = ang - 90;
+        elseif(ang > 80)
+            ang = ang - 90;
+        end
         ImR  = imrotate(ImSudoku,ang);
         ImRb = imrotate(ImSudokub,ang);
 
