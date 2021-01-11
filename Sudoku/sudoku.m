@@ -20,7 +20,7 @@ function [MSudokus,num_MSudokus] = sudoku(image)
         end
         
         % Detectar números (Mario)
-        MaSudoku = get_numbers(squares);
+        [n,rotado] = Num_Identification(im, rotar, mostrar)
         
         % Se guarda en la estructura
         MSudokus(k).Matrix = MaSudoku;
@@ -59,6 +59,7 @@ end
                 
                 % square con imagen de la casilla
                 MSudoku(fila,columna) = detect_number(square(i).Image);
+                [squares,num_squares] = find_squares(ImSudokus(k).Image);
                 
                 % Control horientación en función del número
                 % ...

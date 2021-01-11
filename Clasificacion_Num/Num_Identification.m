@@ -11,6 +11,7 @@ function [n,rotado] = Num_Identification(im, rotar, mostrar)
     %         0 -> No
     %         1 -> Si
     %         2 -> Ya rotado 90º (puede estar invertido)
+    %         3 -> Ya rotado 180º
 
     % Mostrar: si se deben mostrar los resultados (plots)
     %         0 -> No
@@ -18,7 +19,14 @@ function [n,rotado] = Num_Identification(im, rotar, mostrar)
     
     rotado = 0;                             % Inicializamos a cero y sobreescribiremos
     n = 0;
-
+    
+%%%%%% ROTAR IMAGEN %%%%%%%%%%
+    if rotar == 1
+        im = imrotate(im,90);
+    elseif rotar == 2
+        im = imrotate(im,180);
+    end
+    
 %%%%%% PROPERTIES OBTENCION %%%%%%%
 
     imh = histeq(im);                       % Mejora el contraste mediante la ecualización del histograma
