@@ -13,7 +13,6 @@ function [n,rotado] = Num_Identification(im, rotar, mostrar)
     %         2 -> Se debe rotar 90º (puede estar invertido)
     %         3 -> Se debe rotar 180º
     %         4 -> Se debe rotar 90º (ya comprobado que no está invertido)
-    %         5 -> Se debe rotar -90º (ya comprobado que no está invertido)
 
     % Mostrar: si se deben mostrar los resultados (plots)
     %         0 -> No
@@ -23,12 +22,10 @@ function [n,rotado] = Num_Identification(im, rotar, mostrar)
     n = 0;
     
 %%%%%% ROTAR IMAGEN %%%%%%%%%%
-    if rotar == 2 || rotar == 4
+    if rotar == 2
         im = imrotate(im,90);
     elseif rotar == 3
         im = imrotate(im,180);
-    elseif rotar == 5
-        im = imrotate(im,-90);
     end
     
 %%%%%% PROPERTIES OBTENCION %%%%%%%

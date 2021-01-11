@@ -7,10 +7,10 @@ for i  = 1:9
         im_r = imrotate(im,90);
         im_r2 = imrotate(im,-90);
         
-        [n,rotado] = Num_Identification(im, 1, 0);
+        [n,rotado] = Num_Identification(im, 0, 0);
         [n_i,rotado_i] = Num_Identification(im_i, 2, 0);
-        [n_r,rotado_r] = Num_Identification(im_r, 1, 0);
-        [n_r2,rotado_r2] = Num_Identification(im_r2, 1, 0);
+        [n_r,rotado_r] = Num_Identification(im_r, 0, 0);
+        [n_r2,rotado_r2] = Num_Identification(im_r2, 0, 0);
         
 %         numero = k
 %         numero_correcto = n

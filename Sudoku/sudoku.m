@@ -21,7 +21,7 @@ function [MSudokus,num_MSudokus] = sudoku(image)
         end
         
         % Detectar números (Mario)
-        [n,rotado] = Num_Identification(im, rotar, mostrar)
+        MaSudoku = get_numbers(squares);
         
         % Se guarda en la estructura
         MSudokus(k).Matrix = MaSudoku;
@@ -47,7 +47,8 @@ end
         columna = 1;
         % Control orientación vertical y horizontal
         % ...
-        
+        rotado = 0;
+        MCodigos = zeros(9);
         % Si están todas las casillas
         if(num_squares == 81)
             % Por cada una:
@@ -57,22 +58,36 @@ end
                     columna = 1;
                     fila = fila+1;
                 end
+                if(MCodigos == 1)
+                    continue
+                end
                 
-                % square con imagen de la casilla
-                MSudoku(fila,columna) = detect_number(square(i).Image);
-                [squares,num_squares] = find_squares(ImSudokus(k).Image);
+                numero = funcion_Jorge(square(i).Image);
                 
-                % Control horientación en función del número
-                % ...
-                
+                if(numero == 0)
+                    MSudoku(fila,columna) = 0;
+                else
+                    % square con imagen de la casilla
+                    [num,rotado] = detect_number(square(i).Image,rotado);
+                    
+                    if(rotado == 1)
+                        % Control orientación en función del número
+                        [MSudoku,MCodigos] = control_rot(MSudoku);
+                        i = 1;
+                    else
+                        MSudoku(fila,columna) = num;
+                    end
                 columna = columna+1; % Siguiente columna
             end
         else
             % Código de error
         end
 
+function MSudokuG = control_rot(MSudoku)
+    MSudokuG = MSudoku';
 
-
+end
+    
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
