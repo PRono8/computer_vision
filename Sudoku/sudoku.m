@@ -16,12 +16,50 @@ function [MSudokus,num_MSudokus] = sudoku(image)
         img = imcomplement(ImSudokus(k).Image);
         squares = find_cells(img);
         num_squares = length(squares);
-        
+
         % Gestionar error si num_squares != 81
         if(num_squares ~= 81)
             warning('Un Sudoku detectado incorrecto')
             continue
         end
+        
+        empty = [];
+        for i=1:81
+            
+            im_cell = squares{i};
+            figure
+            subplot(1,4,1)
+            imshow(squares{i});
+            prop = regionprops(squares{i},'Area','EulerNumber','ConvexImage','BoundingBox');
+            max_area = max([prop.Area]);
+            object = find([prop.Area] ==  max_area);
+           
+            box = prop(object).BoundingBox;
+            margx = 0.2*max(box(3),box(4))/2;
+            cell = imcrop(im_cell, [box(1)+margx, box(2)+margx, box(3)-2*margx, box(4)-2*margx]); % You can x, y, height and width for coord(k)
+            subplot(1,4,2)
+            imshow(cell);
+            
+            cellc = imcomplement(cell);
+            subplot(1,4,3)
+            imshow(cellc);
+            prop2 = regionprops(cellc,'Area','EulerNumber','Image','BoundingBox');
+            
+            if(isempty(prop2))
+                empty(i) = 1;
+                squares2{i} = cellc;
+            else
+                empty(i) = 0;
+                
+                max_area = max([prop2.Area]);
+                object = find([prop2.Area] ==  max_area);
+
+                squares2{i} = prop2(object).Image;
+                subplot(1,4,4)
+                imshow(squares2{i});
+            end
+        end
+        empty
         
         % Detectar números (Mario)
         MaSudoku = get_numbers(squares,num_squares);
@@ -42,7 +80,56 @@ end
         % squares(19).Image - squares(27).Image -> Tercera fila
         % Código:
         % squares(i).Image = casilla_i;
+
+
+%% Detectar números (Mario)
+%         %Dentro de la función:
+%         fila = 1;
+%         columna = 1;
+%         % Control orientación vertical y horizontal
+%         % ...
+%         rotado = 0;
+%         MCodigos = zeros(9);
+%         % Si están todas las casillas
+%         if(num_squares == 81)
+%             % Por cada una:
+%             for i=1:num_squares
+%                 % Por cada fila
+%                 if(mod(i,9)==0)
+%                     columna = 1;
+%                     fila = fila+1;
+%                 end
+%                 if(MCodigos == 1)
+%                     continue
+%                 end
+%                 
+%                 numero = funcion_Jorge(square(i).Image);
+%                 
+%                 if(numero == 0)
+%                     MSudoku(fila,columna) = 0;
+%                 else
+%                     % square con imagen de la casilla
+%                     [num,rotado] = detect_number(square(i).Image,rotado);
+%                     
+%                     if(rotado == 1)
+%                         % Control orientación en función del número
+%                         [MSudoku,MCodigos] = control_rot(MSudoku);
+%                         i = 1;
+%                     else
+%                         MSudoku(fila,columna) = num;
+%                     end
+%                 columna = columna+1; % Siguiente columna
+%             end
+%         else
+%             % Código de error
+%         end
+% 
+% function MSudokuG = control_rot(MSudoku)
+%     MSudokuG = MSudoku';
+% 
+% end
     
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %             % [A] = find_numbers(imGray);
