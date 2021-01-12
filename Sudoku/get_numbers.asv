@@ -16,9 +16,7 @@ function [MSudoku] = get_numbers(square,num_squares)
                     fila = fila+1;
                 end
                 
-                %[numero,im] = funcion_Jorge(square(i).Image);
-                numero = 1;
-                im = square{i};
+                [im,numero,are] = empty_squares_detection(square{i},0);
                 
                 if(numero == 0)                                 % Casilla vacía
                     MSudoku(fila,columna) = 0;                  % Guardo cero en Sudoku
@@ -80,7 +78,7 @@ function [MSudoku] = Control_rotado(n, square, Mrotacion, MSudoku)
        columna = mod(i,9);
        
        if Mrotacion(fila,columna)==1
-           [~,im] = funcion_Jorge(square(i).Image);
+           [im,~] = empty_squares_detection(square{i},0);
            [num,~] = Num_Identification(im, 3, 0);
            MSudoku(fila,columna) = num;
        end
@@ -90,13 +88,14 @@ end
 function [MSudoku] = Giro_matriz(rotar, A)
     switch rotar
         case 3      % Rotar 180º
-           MSudoku = [A();A();A()];
+           MSudoku = [fliplr(A(3,:)) ;fliplr(A(2,:)) ;fliplr(A(1,:)) ];
         case 4      % Rotar 90º
-           MSudoku = [A();A();A()];
+           MSudoku = [A(:,3)' ;A(:,2)' ;A(:,1)' ];
         case 5      % Rotar -90º
-           MSudoku = [A(3,:)',A(2,:)',A()];
+           MSudoku = [A(3,:)' ,A(2,:)' ,A(1,:)' ];
         otherwise
             warning('Entra en Giro_matriz erroneamente (rotar = 0||2)')
+    end
 end
 
 

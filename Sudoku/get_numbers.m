@@ -16,9 +16,7 @@ function [MSudoku] = get_numbers(square,num_squares)
                     fila = fila+1;
                 end
                 
-                %[numero,im] = funcion_Jorge(square(i).Image);
-                numero = 1;
-                im = square{i};
+                [im,numero,area_total] = empty_squares_detection(square{i},0);
                 
                 if(numero == 0)                                 % Casilla vacía
                     MSudoku(fila,columna) = 0;                  % Guardo cero en Sudoku
@@ -80,7 +78,7 @@ function [MSudoku] = Control_rotado(n, square, Mrotacion, MSudoku)
        columna = mod(i,9);
        
        if Mrotacion(fila,columna)==1
-           [~,im] = funcion_Jorge(square(i).Image);
+           [im,~,~] = empty_squares_detection(square{i},0);
            [num,~] = Num_Identification(im, 3, 0);
            MSudoku(fila,columna) = num;
        end

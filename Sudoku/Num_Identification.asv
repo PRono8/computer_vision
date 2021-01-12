@@ -37,25 +37,21 @@ function [n,rotado] = Num_Identification(im, rotar, mostrar)
 %     imbw = im2bw(imh,0.2);                  % Convertir imagen a imagen binaria, basada en umbral
     imf = (im);                        % Inviwerte (para tener números en blanco)
 
-    im1 = bwmorph(imf,'erode',1);           % Hace una erosión
-    im2 = bwmorph(im1,'dilate',1);          % 4 dilataciones
+    im1 = bwmorph(imf,'erode',0.5);           % Hace una erosión
+    im2 = bwmorph(im1,'dilate',0.5);          % 4 dilataciones
     
     
     
-    esqueleto1 = bwmorph(im1,'thin',inf);    % thin = adelagaza los objetos hasta líneas = esqueleto
-    
-    esqueleto = bwskel(im1);
+    esqueleto = bwmorph(im2,'thin',inf);    % thin = adelagaza los objetos hasta líneas = esqueleto
     figure,
-    subplot(151);
+    subplot(141);
     imshow(im);
-    subplot(152);
+    subplot(142);
     imshow(im1);
-    subplot(153);
+    subplot(143);
     imshow(im2);
-    subplot(154);
+    subplot(144);
     imshow(esqueleto);
-    subplot(155);
-    imshow(esqueleto1);
 
     % ROI = esqueleto(50:140, 30:260);      % Nos quedamos la región de interés deseada
     % im1 = bwlabel(ROI);                   % Etiqueta reg coneectadas
