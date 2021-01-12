@@ -42,56 +42,7 @@ end
         % squares(19).Image - squares(27).Image -> Tercera fila
         % Código:
         % squares(i).Image = casilla_i;
-
-
-%% Detectar números (Mario)
-%         %Dentro de la función:
-%         fila = 1;
-%         columna = 1;
-%         % Control orientación vertical y horizontal
-%         % ...
-%         rotado = 0;
-%         MCodigos = zeros(9);
-%         % Si están todas las casillas
-%         if(num_squares == 81)
-%             % Por cada una:
-%             for i=1:num_squares
-%                 % Por cada fila
-%                 if(mod(i,9)==0)
-%                     columna = 1;
-%                     fila = fila+1;
-%                 end
-%                 if(MCodigos == 1)
-%                     continue
-%                 end
-%                 
-%                 numero = funcion_Jorge(square(i).Image);
-%                 
-%                 if(numero == 0)
-%                     MSudoku(fila,columna) = 0;
-%                 else
-%                     % square con imagen de la casilla
-%                     [num,rotado] = detect_number(square(i).Image,rotado);
-%                     
-%                     if(rotado == 1)
-%                         % Control orientación en función del número
-%                         [MSudoku,MCodigos] = control_rot(MSudoku);
-%                         i = 1;
-%                     else
-%                         MSudoku(fila,columna) = num;
-%                     end
-%                 columna = columna+1; % Siguiente columna
-%             end
-%         else
-%             % Código de error
-%         end
-% 
-% function MSudokuG = control_rot(MSudoku)
-%     MSudokuG = MSudoku';
-% 
-% end
     
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %             % [A] = find_numbers(imGray);
