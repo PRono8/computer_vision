@@ -79,274 +79,279 @@ for i=1:length(lines)
     end    
 end
 
-%ordenar de menor a mayor horizontales y verticales
+if length(lines_horizontal)~=9 || length(lines_vertical)~=9
+    image_cell=[];
+    warning( 'No se ha detectado Sudoku')
+else
 
-for i=1:length(lines_vertical)-1
-    for j=1:length(lines_vertical)-1
-    if lines_vertical(j).point1(1)>lines_vertical(j+1).point1(1)
-        aux=lines_vertical(j);
-        lines_vertical(j)=lines_vertical(j+1);
-        lines_vertical(j+1)=aux;
+    %ordenar de menor a mayor horizontales y verticales
+
+    for i=1:length(lines_vertical)-1
+        for j=1:length(lines_vertical)-1
+        if lines_vertical(j).point1(1)>lines_vertical(j+1).point1(1)
+            aux=lines_vertical(j);
+            lines_vertical(j)=lines_vertical(j+1);
+            lines_vertical(j+1)=aux;
+        end
+        end
     end
+
+    for i=1:length(lines_horizontal)-1
+        for j=1:length(lines_horizontal)-1
+        if lines_horizontal(j).point1(2)>lines_horizontal(j+1).point1(2)
+            aux=lines_horizontal(j);
+            lines_horizontal(j)=lines_horizontal(j+1);
+            lines_horizontal(j+1)=aux;
+        end
+        end
     end
-end
 
-for i=1:length(lines_horizontal)-1
-    for j=1:length(lines_horizontal)-1
-    if lines_horizontal(j).point1(2)>lines_horizontal(j+1).point1(2)
-        aux=lines_horizontal(j);
-        lines_horizontal(j)=lines_horizontal(j+1);
-        lines_horizontal(j+1)=aux;
+    %Si no conseguimos detectar bordes (a veces pasa) los eliminamos sabiendo
+    %que son el primer  ultimo elemento dsps de ordenar
+    if length(lines_horizontal(:))==10
+        lines_horizontal=lines_horizontal(2:length(lines_horizontal)-1);
+
     end
+    if length(lines_vertical(:))==10
+        lines_vertical=lines_vertical(2:length(lines_vertical)-1);
     end
-end
+    if length(lines_horizontal(:))==9
+        lines_horizontal=lines_horizontal(1:length(lines_horizontal)-1);
 
-%Si no conseguimos detectar bordes (a veces pasa) los eliminamos sabiendo
-%que son el primer  ultimo elemento dsps de ordenar
-if length(lines_horizontal(:))==10
-    lines_horizontal=lines_horizontal(2:length(lines_horizontal)-1);
-
-end
-if length(lines_vertical(:))==10
-    lines_vertical=lines_vertical(2:length(lines_vertical)-1);
-end
-if length(lines_horizontal(:))==9
-    lines_horizontal=lines_horizontal(1:length(lines_horizontal)-1);
-
-end
-if length(lines_vertical(:))==9
-    lines_vertical=lines_vertical(1:length(lines_vertical)-1);
-end
-
-
-%%
-
-
-
-max_len = 0;
-xmin=1000;
-xmax=0;
-ymin=1000;
-ymax=0;
-
-for k = 1:length(lines)
-    xy = [lines(k).point1; lines(k).point2];  
-
-    %Determine the endpoints of the longest line segment   
-    len = norm(lines(k).point1 - lines(k).point2);   
-    if ( len > max_len)       
-        max_len = len;       
-        xy_long = xy;   
     end
-    
-    Pxmin=min([lines(k).point1(1),lines(k).point2(1)]);
-    Pxmax=max([lines(k).point1(1),lines(k).point2(1)]);
+    if length(lines_vertical(:))==9
+        lines_vertical=lines_vertical(1:length(lines_vertical)-1);
+    end
 
-    Pymin=min([lines(k).point1(2),lines(k).point2(2)]);
-    Pymax=max([lines(k).point1(2),lines(k).point2(2)]);
 
-    
-    if (Pxmin<xmin)
-        xmin=Pxmin;
+    %%
+
+
+
+    max_len = 0;
+    xmin=1000;
+    xmax=0;
+    ymin=1000;
+    ymax=0;
+
+    for k = 1:length(lines)
+        xy = [lines(k).point1; lines(k).point2];  
+
+        %Determine the endpoints of the longest line segment   
+        len = norm(lines(k).point1 - lines(k).point2);   
+        if ( len > max_len)       
+            max_len = len;       
+            xy_long = xy;   
+        end
+
+        Pxmin=min([lines(k).point1(1),lines(k).point2(1)]);
+        Pxmax=max([lines(k).point1(1),lines(k).point2(1)]);
+
+        Pymin=min([lines(k).point1(2),lines(k).point2(2)]);
+        Pymax=max([lines(k).point1(2),lines(k).point2(2)]);
+
+
+        if (Pxmin<xmin)
+            xmin=Pxmin;
+        end
+        if (Pxmax>xmax)
+            xmax=Pxmax;
+        end
+        if (Pymin<ymin)
+            ymin=Pymin;
+        end
+        if (Pymax>ymax)
+            ymax=Pymax;    
+        end
+
+
     end
-    if (Pxmax>xmax)
-        xmax=Pxmax;
+
+    % Cálculo puntos de corte rectas
+    crossingpoints=zeros(length(lines_horizontal)*length(lines_vertical),2);
+    %crossingpoints=zeros((length(lines)/2)^2,2);
+
+    cont=1;
+
+
+
+    for i=1:length(lines_horizontal) %horizontales
+        for j=1:length(lines_vertical) %verticales
+
+        x1=lines_horizontal(i).point1(1);
+        y1=lines_horizontal(i).point1(2);
+
+        x2=lines_horizontal(i).point2(1);
+        y2=lines_horizontal(i).point2(2);
+
+
+        x3=lines_vertical(j).point1(1);
+        y3=lines_vertical(j).point1(2);
+
+        x4=lines_vertical(j).point2(1);
+        y4=lines_vertical(j).point2(2);
+
+        A=[y2-y1 , -(x2-x1);
+        y4-y3, -(x4-x3)];
+
+        B=[(y1*x1 - y1*x2) - (x1*y1 - x1*y2);
+        (y3*x3 - y3*x4) - (y3*x3 - x3*y4)];
+
+        x=A\B;
+
+        crossingpoints(cont,:)=x;
+        cont=cont+1;
+        end
     end
-    if (Pymin<ymin)
-        ymin=Pymin;
+
+
+
+
+
+    %% Generación vector imágenes de cuadrícula (ordena por filas)
+
+
+    if length(lines_horizontal)==8
+    xi=xmin;
+    yi=ymin;
+    n=81;
+    image_cell=cell(n,1);
+    contPoints=1;
+    for i=1:8
+        %fila 1
+        image_cell{i}=imR(yi:crossingpoints(contPoints,2),xi:crossingpoints(contPoints,1));
+
+        xi=crossingpoints(contPoints,1);
+        contPoints=contPoints+1;
     end
-    if (Pymax>ymax)
-        ymax=Pymax;    
+    i=i+1;
+    image_cell{i}=imR(yi:crossingpoints(contPoints-1,2),xi:xmax);
+
+    xi=xmin;
+    yi=crossingpoints(1,2);
+
+    for i=10:17
+        %fila 2
+        image_cell{i}=imR(yi:crossingpoints(contPoints,2),xi:crossingpoints(contPoints,1));
+
+        xi=crossingpoints(contPoints,1);
+        contPoints=contPoints+1;
+
+    end 
+    i=i+1;
+    image_cell{i}=imR(yi:crossingpoints(contPoints-1,2),xi:xmax);
+
+    xi=xmin;
+
+    yi=crossingpoints(9,2);
+
+    for i=19:26
+        %fila 3
+        image_cell{i}=imR(yi:crossingpoints(contPoints,2),xi:crossingpoints(contPoints,1));
+
+        xi=crossingpoints(contPoints,1);
+        contPoints=contPoints+1;
+
+    end 
+    i=i+1;
+    image_cell{i}=imR(yi:crossingpoints(contPoints-1,2),xi:xmax);
+
+    xi=xmin;
+
+    yi=crossingpoints(17,2);
+    for i=28:35
+        %fila 4
+        image_cell{i}=imR(yi:crossingpoints(contPoints,2),xi:crossingpoints(contPoints,1));
+
+        xi=crossingpoints(contPoints,1);
+        contPoints=contPoints+1;
+
+    end 
+    i=i+1;
+    image_cell{i}=imR(yi:crossingpoints(contPoints-1,2),xi:xmax);
+
+    xi=xmin;
+
+    yi=crossingpoints(25,2);
+    for i=37:44
+        %fila 5
+        image_cell{i}=imR(yi:crossingpoints(contPoints,2),xi:crossingpoints(contPoints,1));
+
+
+        xi=crossingpoints(contPoints,1);
+        contPoints=contPoints+1;
+
+    end 
+    i=i+1;
+    image_cell{i}=imR(yi:crossingpoints(contPoints-1,2),xi:xmax);
+
+    xi=xmin;
+
+    yi=crossingpoints(33,2);
+    for i=46:53
+        %fila 6
+        image_cell{i}=imR(yi:crossingpoints(contPoints,2),xi:crossingpoints(contPoints,1));
+
+
+        xi=crossingpoints(contPoints,1);
+        contPoints=contPoints+1;
+
+    end 
+    i=i+1;
+    image_cell{i}=imR(yi:crossingpoints(contPoints-1,2),xi:xmax);
+
+    xi=xmin;
+
+    yi=crossingpoints(41,2);
+
+    for i=55:62
+        %fila 7
+        image_cell{i}=imR(yi:crossingpoints(contPoints,2),xi:crossingpoints(contPoints,1));
+
+
+        xi=crossingpoints(contPoints,1);
+        contPoints=contPoints+1;
+
+    end 
+    i=i+1;
+    image_cell{i}=imR(yi:crossingpoints(contPoints-1,2),xi:xmax);
+
+    xi=xmin;
+
+    yi=crossingpoints(49,2);
+    for i=64:71
+        %fila 8
+
+        image_cell{i}=imR(yi:crossingpoints(contPoints,2),xi:crossingpoints(contPoints,1));
+
+
+        xi=crossingpoints(contPoints,1);
+        contPoints=contPoints+1;
+
+    end 
+    i=i+1;
+    image_cell{i}=imR(yi:crossingpoints(contPoints-1,2),xi:xmax);
+
+    xi=xmin;
+
+    yi=crossingpoints(57,2);
+    contPoints=contPoints-8;
+    for i=73:80
+        %fila 9
+
+        image_cell{i}=imR(yi:ymax,xi:crossingpoints(contPoints,1));
+
+
+        xi=crossingpoints(contPoints,1);
+        contPoints=contPoints+1;
+
+
+    end 
+    i=i+1;
+    image_cell{i}=imR(yi:ymax,xi:xmax);
+
     end
-    
-    
+
 end
-
-% Cálculo puntos de corte rectas
-crossingpoints=zeros(length(lines_horizontal)*length(lines_vertical),2);
-%crossingpoints=zeros((length(lines)/2)^2,2);
-
-cont=1;
-
-
-
-for i=1:length(lines_horizontal) %horizontales
-    for j=1:length(lines_vertical) %verticales
-    
-    x1=lines_horizontal(i).point1(1);
-    y1=lines_horizontal(i).point1(2);
-
-    x2=lines_horizontal(i).point2(1);
-    y2=lines_horizontal(i).point2(2);
-
- 
-    x3=lines_vertical(j).point1(1);
-    y3=lines_vertical(j).point1(2);
-
-    x4=lines_vertical(j).point2(1);
-    y4=lines_vertical(j).point2(2);
-    
-    A=[y2-y1 , -(x2-x1);
-    y4-y3, -(x4-x3)];
-
-    B=[(y1*x1 - y1*x2) - (x1*y1 - x1*y2);
-    (y3*x3 - y3*x4) - (y3*x3 - x3*y4)];
-
-    x=A\B;
-
-    crossingpoints(cont,:)=x;
-    cont=cont+1;
-    end
-end
-
-
-
-
-
-%% Generación vector imágenes de cuadrícula (ordena por filas)
-
-
-if length(lines_horizontal)==8
-xi=xmin;
-yi=ymin;
-n=81;
-image_cell=cell(n,1);
-contPoints=1;
-for i=1:8
-    %fila 1
-    image_cell{i}=imR(yi:crossingpoints(contPoints,2),xi:crossingpoints(contPoints,1));
-
-    xi=crossingpoints(contPoints,1);
-    contPoints=contPoints+1;
-end
-i=i+1;
-image_cell{i}=imR(yi:crossingpoints(contPoints-1,2),xi:xmax);
-
-xi=xmin;
-yi=crossingpoints(1,2);
-
-for i=10:17
-    %fila 2
-    image_cell{i}=imR(yi:crossingpoints(contPoints,2),xi:crossingpoints(contPoints,1));
-
-    xi=crossingpoints(contPoints,1);
-    contPoints=contPoints+1;
-
-end 
-i=i+1;
-image_cell{i}=imR(yi:crossingpoints(contPoints-1,2),xi:xmax);
-
-xi=xmin;
-
-yi=crossingpoints(9,2);
-
-for i=19:26
-    %fila 3
-    image_cell{i}=imR(yi:crossingpoints(contPoints,2),xi:crossingpoints(contPoints,1));
-
-    xi=crossingpoints(contPoints,1);
-    contPoints=contPoints+1;
-
-end 
-i=i+1;
-image_cell{i}=imR(yi:crossingpoints(contPoints-1,2),xi:xmax);
-
-xi=xmin;
-
-yi=crossingpoints(17,2);
-for i=28:35
-    %fila 4
-    image_cell{i}=imR(yi:crossingpoints(contPoints,2),xi:crossingpoints(contPoints,1));
-
-    xi=crossingpoints(contPoints,1);
-    contPoints=contPoints+1;
-
-end 
-i=i+1;
-image_cell{i}=imR(yi:crossingpoints(contPoints-1,2),xi:xmax);
-
-xi=xmin;
-
-yi=crossingpoints(25,2);
-for i=37:44
-    %fila 5
-    image_cell{i}=imR(yi:crossingpoints(contPoints,2),xi:crossingpoints(contPoints,1));
-
-
-    xi=crossingpoints(contPoints,1);
-    contPoints=contPoints+1;
-
-end 
-i=i+1;
-image_cell{i}=imR(yi:crossingpoints(contPoints-1,2),xi:xmax);
-
-xi=xmin;
-
-yi=crossingpoints(33,2);
-for i=46:53
-    %fila 6
-    image_cell{i}=imR(yi:crossingpoints(contPoints,2),xi:crossingpoints(contPoints,1));
-
-
-    xi=crossingpoints(contPoints,1);
-    contPoints=contPoints+1;
-
-end 
-i=i+1;
-image_cell{i}=imR(yi:crossingpoints(contPoints-1,2),xi:xmax);
-
-xi=xmin;
-
-yi=crossingpoints(41,2);
-
-for i=55:62
-    %fila 7
-    image_cell{i}=imR(yi:crossingpoints(contPoints,2),xi:crossingpoints(contPoints,1));
-
-
-    xi=crossingpoints(contPoints,1);
-    contPoints=contPoints+1;
-
-end 
-i=i+1;
-image_cell{i}=imR(yi:crossingpoints(contPoints-1,2),xi:xmax);
-
-xi=xmin;
-
-yi=crossingpoints(49,2);
-for i=64:71
-    %fila 8
-    
-    image_cell{i}=imR(yi:crossingpoints(contPoints,2),xi:crossingpoints(contPoints,1));
-
-
-    xi=crossingpoints(contPoints,1);
-    contPoints=contPoints+1;
-
-end 
-i=i+1;
-image_cell{i}=imR(yi:crossingpoints(contPoints-1,2),xi:xmax);
-
-xi=xmin;
-
-yi=crossingpoints(57,2);
-contPoints=contPoints-8;
-for i=73:80
-    %fila 9
-    
-    image_cell{i}=imR(yi:ymax,xi:crossingpoints(contPoints,1));
-
-
-    xi=crossingpoints(contPoints,1);
-    contPoints=contPoints+1;
-
-
-end 
-i=i+1;
-image_cell{i}=imR(yi:ymax,xi:xmax);
-
-end
-
-
 
 end
