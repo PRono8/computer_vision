@@ -1,68 +1,70 @@
 function [image_cell] = find_cells(img1)
 %% Resolucion identificacion cuadriculas transformada de hough
-%% Binarización
- imR = imbinarize(img1);
+%%Resolucion identificacion cuadriculas transformada de hough
+%% Lectura del fichero
+% Recortamos la imagen para trabajar sobre esta parte
+sum=0;
+for i=1:length(img1(:,1))
+    for j=1:length(img1(1,:))
+        sum=sum+img1(i,j);
+    end
+end
+media_pixel=sum/(length(img1(:,1))*length(img1(1,:)));
+imR = imbinarize(img1,'adaptive','ForegroundPolarity','dark','Sensitivity',0.58);
+
 %% Resolución mediante Sobel
+% Ahora lo realizamos mediante la función imfilter
 imagenSobelH = imfilter(imR,fspecial('sobel'),'replicate');
 imagenSobelH = double(imagenSobelH);
 imagenSobelV = imfilter(imR,fspecial('sobel')','replicate');
 imagenSobelV = double(imagenSobelV);
 im2 = sqrt((imagenSobelH.^2)+(imagenSobelV.^2));
-%% Mejora de imagen edge + sobel (solo imagenes)
-se = strel('line',11,0);
-BW2 = imdilate(im2,se);
-se = strel('line',11,90);
-im2 = imdilate(BW2,se);
+%% Mejora de imagen edge + sobel 
+if length(imR(1,:))>=250
+    se = strel('line',0.01*length(img1(:,1)),0);
+    BW2 = imdilate(im2,se);
+    se = strel('line',0.01*length(img1(:,1)),90);
+    im2 = imdilate(BW2,se);
+end
+
+
 %% 
+% img1Gray=rgb2gray(im2);
+% img1BW=imbinarize(img1Gray);
+% imgedge=edge(img1BW);
+
+imgedge=im2;
+
 %transformacion de hough
-[H,T,R] = hough(im2);
-figure,
-imshow(im2);
+[H,T,R] = hough(imgedge);
+
 %busqueda de peaks
-% P  = houghpeaks(H,20,'threshold',ceil(0.3*max(H(:)))); x = T(P(:,2)); y = R(P(:,1)); 
-P  = houghpeaks(H,20,'threshold',ceil(0.3*max(H(:)))); x = T(P(:,2)); y = R(P(:,1)); 
+P  = houghpeaks(H,24,'threshold',ceil(0.3*max(H(:)))); x = T(P(:,2)); y = R(P(:,1)); %plot(x,y,'s','color','white');
+
+
 %busqueda de lineas
-lines = houghlines(im2,T,R,P,'FillGap',fill,'MinLength',minlength);
-%buscamos bordes que esten en los extremos y los eliminamos
-margen=80;
+lines = houghlines(imgedge,T,R,P,'FillGap',600,'MinLength',0.8*length(img1(:,1)));
+diagonales=[];
 cont=1;
-% if (~isempty(lines))
-%     figure,
-%     imshow(im2);
-%     error('No se han detectado lineas');
-% end
 for i=1:length(lines)
-    %borde izquierdo
-    if lines(i).point1(1)<=margen && lines(i).point2(1)<=margen
-        bordes(cont)=i;
-        cont=cont+1;
-    end
-    %borde superior
-    if lines(i).point1(2)<= margen && lines(i).point2(2)<=margen
-        bordes(cont)=i;
-        cont=cont+1;
-    end
-    %borde derecho
-    if lines(i).point1(1)>=length(imR(:,1))-margen && lines(i).point2(1)>=length(imR(:,1))-margen
-
-        bordes(cont)=i;
-        cont=cont+1;
-    end
-     %borde inferior
-    if lines(i).point1(2)>=(length(imR(:,1))-(margen+35)) && lines(i).point2(2)>=(length(imR(:,1))-(margen+35))
-        bordes(cont)=i;
+    if abs(abs(lines(i).theta)-90)>=15 && abs(lines(i).theta)>=15   
+        diagonales(cont)=i;
         cont=cont+1;
     end
 end
-%eliminamos las lineas que hemos identificado como bordes
-bordes=sort(bordes);
 cont2=0;
-for i=1:length(bordes)
-    lines(bordes(i)-cont2)=[];
-    cont2=cont2+1;
-end
 
-%Separar en Horizontales y verticales las linesas encontradas
+% if cont>1
+    for i=1:length(diagonales)
+        lines(diagonales(i)-cont2)=[];
+        cont2=cont2+1;
+    end
+% end
+%% 
+clear lines_horizontal;
+clear lines_vertical;
+
+%Separar en Horizontales y verticales
 contvertical=1;
 conthorizontal=1;
 for i=1:length(lines)
@@ -78,6 +80,7 @@ for i=1:length(lines)
 end
 
 %ordenar de menor a mayor horizontales y verticales
+
 for i=1:length(lines_vertical)-1
     for j=1:length(lines_vertical)-1
     if lines_vertical(j).point1(1)>lines_vertical(j+1).point1(1)
@@ -98,8 +101,28 @@ for i=1:length(lines_horizontal)-1
     end
 end
 
+%Si no conseguimos detectar bordes (a veces pasa) los eliminamos sabiendo
+%que son el primer  ultimo elemento dsps de ordenar
+if length(lines_horizontal(:))==10
+    lines_horizontal=lines_horizontal(2:length(lines_horizontal)-1);
 
-% Valores máximos de x e y
+end
+if length(lines_vertical(:))==10
+    lines_vertical=lines_vertical(2:length(lines_vertical)-1);
+end
+if length(lines_horizontal(:))==9
+    lines_horizontal=lines_horizontal(1:length(lines_horizontal)-1);
+
+end
+if length(lines_vertical(:))==9
+    lines_vertical=lines_vertical(1:length(lines_vertical)-1);
+end
+
+
+%%
+
+
+
 max_len = 0;
 xmin=1000;
 xmax=0;
@@ -107,9 +130,9 @@ ymin=1000;
 ymax=0;
 
 for k = 1:length(lines)
-        xy = [lines(k).point1; lines(k).point2];  
+    xy = [lines(k).point1; lines(k).point2];  
 
-    % Determine the endpoints of the longest line segment   
+    %Determine the endpoints of the longest line segment   
     len = norm(lines(k).point1 - lines(k).point2);   
     if ( len > max_len)       
         max_len = len;       
@@ -138,13 +161,17 @@ for k = 1:length(lines)
     
     
 end
-%% Cálculo puntos de corte rectas
-crossingpoints=zeros((length(lines)/2)^2,2);
+
+% Cálculo puntos de corte rectas
+crossingpoints=zeros(length(lines_horizontal)*length(lines_vertical),2);
+%crossingpoints=zeros((length(lines)/2)^2,2);
 
 cont=1;
 
-for i=1:length(lines_horizontal) 
-    for j=1:length(lines_vertical)
+
+
+for i=1:length(lines_horizontal) %horizontales
+    for j=1:length(lines_vertical) %verticales
     
     x1=lines_horizontal(i).point1(1);
     y1=lines_horizontal(i).point1(2);
@@ -173,7 +200,13 @@ for i=1:length(lines_horizontal)
 end
 
 
+
+
+
 %% Generación vector imágenes de cuadrícula (ordena por filas)
+
+
+if length(lines_horizontal)==8
 xi=xmin;
 yi=ymin;
 n=81;
@@ -311,5 +344,9 @@ for i=73:80
 end 
 i=i+1;
 image_cell{i}=imR(yi:ymax,xi:xmax);
+
 end
 
+
+
+end
