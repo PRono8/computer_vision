@@ -1,4 +1,4 @@
-function [image_cell] = find_cells(img1)
+function [image_cell] = find_cells(img1,display)
 %% Resolucion identificacion cuadriculas transformada de hough
 %%Resolucion identificacion cuadriculas transformada de hough
 %% Lectura del fichero
@@ -19,6 +19,7 @@ imagenSobelH = double(imagenSobelH);
 imagenSobelV = imfilter(imR,fspecial('sobel')','replicate');
 imagenSobelV = double(imagenSobelV);
 im2 = sqrt((imagenSobelH.^2)+(imagenSobelV.^2));
+
 %% Mejora de imagen edge + sobel 
 if length(imR(1,:))>=250
     se = strel('line',0.01*length(img1(:,1)),0);
@@ -373,5 +374,52 @@ if length(lines_horizontal)~=8 || length(lines_vertical)~=8
     image_cell=[];
     disp('Warning: No se ha detectado Sudoku')
 end
+
+
+
+if display==1
+  
+    figure(1)
+    title('Imagen binarizada')
+    imshow(imR)
+
+    figure(2)
+    imshow(im2);
+    title('Resultado con función imfilter(fspecial(sobel))+ Dilatación')
+
+    figure(3)
+	imshow(imR), hold on 
+
+    for k = 1:length(lines)   
+        xy = [lines(k).point1; lines(k).point2];  
+        plot(xy(:,1),xy(:,2),'LineWidth',2,'Color','green');   
+        % Plot beginnings and ends of lines 
+        plot(xy(1,1),xy(1,2),'x','LineWidth',2,'Color','yellow');  
+        plot(xy(2,1),xy(2,2),'x','LineWidth',2,'Color','red');    
+        hold on
+    end
+    for i=1: length(crossingpoints(:,1))
+        plot(crossingpoints(i,1),crossingpoints(i,2),'x','LineWidth',4,'Color','blue');
+    end
+    figure(4)
+    for i=1:81
+        imshow(image_cell{i})
+        title(['Cuadricula ', num2str(i)]);
+        pause(0.5);
+    end
+end    
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 end

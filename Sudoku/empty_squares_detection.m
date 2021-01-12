@@ -16,15 +16,15 @@ function [squares2,empty,Area] = empty_squares_detection(squares,display)
     cellc = imclearborder(cellc,4);
     
     prop2 = regionprops(cellc,'Area','EulerNumber','Image','BoundingBox');
+
     if (~isempty(prop2))
-        if(~isempty(prop2) && prop2(1).Area > 30)
+        max_area = max([prop2.Area]);
+        object = find([prop2.Area] ==  max_area);
+        if(prop2(object(1)).Area > 30)
             empty = 1;
 
-            max_area = max([prop2.Area]);
-            object = find([prop2.Area] ==  max_area);
-
-            squares2 = prop2(object).Image;
-            Area = prop2(1).Area;
+            squares2 = prop2(object(1)).Image;
+            Area = prop2(object(1)).Area;
         else
             empty = 0;
             Area = 0;

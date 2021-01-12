@@ -42,9 +42,9 @@ function [n,rotado] = Num_Identification(im, rotar, mostrar)
     
     
     
-    esqueleto1 = bwmorph(im1,'thin',inf);    % thin = adelagaza los objetos hasta líneas = esqueleto
+    esqueleto = bwmorph(im1,'thin',inf);    % thin = adelagaza los objetos hasta líneas = esqueleto
     
-    esqueleto = bwskel(im1);
+    esqueleto1 = bwskel(im1);
     figure,
     subplot(151);
     imshow(im);

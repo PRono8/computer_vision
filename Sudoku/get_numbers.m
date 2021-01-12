@@ -3,6 +3,9 @@ function [MSudoku] = get_numbers(square,num_squares)
         fila = 1;
         columna = 1;
         
+        display1 = 0;
+        display2 = 0;
+        
         rotado = 0; 
         rotar = 0;                      % Se inicializa a 0 para q compruebe si hay q rotar
         
@@ -11,18 +14,15 @@ function [MSudoku] = get_numbers(square,num_squares)
         
         if(num_squares == 81)           % Miro si están todas las casillas
             for i=1:num_squares         % Por cada casilla
-                if(mod(i,9)==0)         % Por cada fila
-                    columna = 1;
-                    fila = fila+1;
-                end
                 
-                [im,numero,area_total] = empty_squares_detection(square{i},0);
+                
+                [im,numero,area_total] = empty_squares_detection(square{i},display1);
                 
                 if(numero == 0)                                 % Casilla vacía
                     MSudoku(fila,columna) = 0;                  % Guardo cero en Sudoku
 %                     Mrotacion(fila,columna) = 0;                % Guardo cero para indicar valor seguro
                 else
-                    [num,rotado] = Num_Identification(im, rotar, 1);    % Sino, llamo a función
+                    [num,rotado] = Num_Identification(im, rotar, display2);    % Sino, llamo a función
                     
                      MSudoku(fila,columna) = num;               % Guardo en matriz Sudoku
                      
@@ -59,8 +59,20 @@ function [MSudoku] = get_numbers(square,num_squares)
                                  warning('Sale invertido cuando no debe')
                              end
                      end
-                    
-                columna = columna+1;                            % Siguiente columna
+%                 fila
+%                 columna
+%                 MSudoku
+                
+                
+                end
+                fila
+                columna
+                MSudoku
+                if(mod(i,9)==0)         % Por cada fila
+                    columna = 1;
+                    fila = fila+1;
+                else
+                    columna = columna+1;
                 end
             end
             
@@ -74,12 +86,12 @@ end
 
 function [MSudoku] = Control_rotado(n, square, Mrotacion, MSudoku)
     for i=1:n
-       fila = floor(i/9);
-       columna = mod(i,9);
+       fila = floor(i/10);
+       columna = mod(i,10);
        
        if Mrotacion(fila,columna)==1
-           [im,~,~] = empty_squares_detection(square{i},0);
-           [num,~] = Num_Identification(im, 3, 0);
+           [im,~,~] = empty_squares_detection(square{i},display1);
+           [num,~] = Num_Identification(im, 3, display2);
            MSudoku(fila,columna) = num;
        end
     end 
