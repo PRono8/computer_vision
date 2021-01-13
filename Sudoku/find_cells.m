@@ -204,9 +204,6 @@ end
 
 
 
-%% Generación vector imágenes de cuadrícula (ordena por filas)
-
-
 if length(lines_horizontal)==8
 xi=lines_horizontal(1).point1(1);
 yi=lines_vertical(1).point1(2);
@@ -223,7 +220,7 @@ end
 i=i+1;
 image_cell{i}=imR(yi:crossingpoints(contPoints-1,2),xi:lines_horizontal(1).point2(1));
 
-xi=xmin;
+xi=lines_horizontal(1).point1(1);
 yi=crossingpoints(1,2);
 
 for i=10:17
@@ -238,7 +235,7 @@ end
 i=i+1;
 image_cell{i}=imR(ylast:crossingpoints(contPoints-1,2),xi:lines_horizontal(2).point2(1));
 
-xi=xmin;
+xi=lines_horizontal(2).point1(1);
 
 yi=crossingpoints(9,2);
 
@@ -256,7 +253,7 @@ end
 i=i+1;
 image_cell{i}=imR(ylast:crossingpoints(contPoints-1,2),xi:lines_horizontal(3).point2(1));
 
-xi=xmin;
+xi=lines_horizontal(3).point1(1);
 
 yi=crossingpoints(17,2);
 for i=28:35
@@ -273,7 +270,7 @@ end
 i=i+1;
 image_cell{i}=imR(ylast:crossingpoints(contPoints-1,2),xi:lines_horizontal(4).point2(1));
 
-xi=xmin;
+xi=lines_horizontal(4).point1(1);
 
 yi=crossingpoints(25,2);
 for i=37:44
@@ -291,7 +288,7 @@ end
 i=i+1;
 image_cell{i}=imR(ylast:crossingpoints(contPoints-1,2),xi:lines_horizontal(5).point2(1));
 
-xi=xmin;
+xi=lines_horizontal(5).point1(1);
 
 yi=crossingpoints(33,2);
 for i=46:53
@@ -309,7 +306,7 @@ end
 i=i+1;
 image_cell{i}=imR(ylast:crossingpoints(contPoints-1,2),xi:lines_horizontal(6).point2(1));
 
-xi=xmin;
+xi=lines_horizontal(6).point1(1);;
 
 yi=crossingpoints(41,2);
 
@@ -328,7 +325,7 @@ end
 i=i+1;
 image_cell{i}=imR(ylast:crossingpoints(contPoints-1,2),xi:lines_horizontal(7).point2(1));
 
-xi=xmin;
+xi=lines_horizontal(7).point1(1);
 
 yi=crossingpoints(49,2);
 for i=64:71
@@ -347,7 +344,7 @@ end
 i=i+1;
 image_cell{i}=imR(ylast:crossingpoints(contPoints-1,2),xi:lines_horizontal(8).point2(1));
 
-xi=xmin;
+xi=lines_horizontal(8).point1(1);
 
 yi=crossingpoints(57,2);
 contPoints=contPoints-8;
@@ -402,11 +399,13 @@ if display==1
         plot(crossingpoints(i,1),crossingpoints(i,2),'x','LineWidth',4,'Color','blue');
     end
     figure(4)
-    for i=1:81
-        imshow(image_cell{i})
-        title(['Cuadricula ', num2str(i)]);
-        pause(0.5);
-    end
+for i=1:81
+    subplot(9,9,i)
+    imshow(image_cell{i})
+    
+end
+suptitle('Cell Division')
+
 end    
 
 
