@@ -3,13 +3,6 @@ function [image_cell] = find_cells(img1,display)
 %%Resolucion identificacion cuadriculas transformada de hough
 %% Lectura del fichero
 % Recortamos la imagen para trabajar sobre esta parte
-sum=0;
-for i=1:length(img1(:,1))
-    for j=1:length(img1(1,:))
-        sum=sum+img1(i,j);
-    end
-end
-media_pixel=sum/(length(img1(:,1))*length(img1(1,:)));
 imR = imbinarize(img1,'adaptive','ForegroundPolarity','dark','Sensitivity',0.58);
 
 %% Resolución mediante Sobel
@@ -29,11 +22,7 @@ if length(imR(1,:))>=250
 end
 
 
-%% 
-% img1Gray=rgb2gray(im2);
-% img1BW=imbinarize(img1Gray);
-% imgedge=edge(img1BW);
-
+%% Busqueda de lineas en imagen
 imgedge=im2;
 
 %transformacion de hough
@@ -42,9 +31,10 @@ imgedge=im2;
 %busqueda de peaks
 P  = houghpeaks(H,24,'threshold',ceil(0.3*max(H(:)))); x = T(P(:,2)); y = R(P(:,1)); %plot(x,y,'s','color','white');
 
-
 %busqueda de lineas
 lines = houghlines(imgedge,T,R,P,'FillGap',600,'MinLength',0.8*length(img1(:,1)));
+
+%eliminacion de lines diagonales
 diagonales=[];
 cont=1;
 for i=1:length(lines)
@@ -55,12 +45,10 @@ for i=1:length(lines)
 end
 cont2=0;
 
-% if cont>1
     for i=1:length(diagonales)
         lines(diagonales(i)-cont2)=[];
         cont2=cont2+1;
     end
-% end
 %% 
 clear lines_horizontal;
 clear lines_vertical;
@@ -102,8 +90,7 @@ for i=1:length(lines_horizontal)-1
     end
 end
 
-%Si no conseguimos detectar bordes (a veces pasa) los eliminamos sabiendo
-%que son el primer  ultimo elemento dsps de ordenar
+%Eliminamos lineas que representan bordes
 if length(lines_horizontal(:))==10
     lines_horizontal=lines_horizontal(2:length(lines_horizontal)-1);
 
