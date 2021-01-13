@@ -72,11 +72,16 @@ function [n,rotado] = Num_Identification(im, rotar, mostrar)
         Pfc(:) = [y(Pf),x(Pf)];             % Guadar el ultimo
     else
         Pfc = [0,0];
+        x = 0;
+        y = 0;
     end
 
 
     X_pf = Cen(1)-Pfc(1);                   % Posición relativa en Y del primer punto final respecto al centroide
     Y_pf = Cen(2)-Pfc(2);
+
+    X_pi = Cen(1)-y(1);
+    Y_pi = Cen(2)-x(1);
 
     area_im = size(im);
     area_total = area_im(1)*area_im(2);
@@ -122,18 +127,24 @@ function [n,rotado] = Num_Identification(im, rotar, mostrar)
                     end
                 elseif (X_pf < 0)
                     n = 2;
+                else
+                    n = 3;
                 end
-            elseif (X_pf < 1)
+            elseif (X_pf < 1 && Y_pf < 0)
                 n = 1;
             else
                 n = 7;
             end
         end
         if (Pf == 3)
-            if (Y_pf > 0)
+            if (X_pf > 0)
                 n = 3;
-            else
-                n = 1;
+            elseif (Y_pf < 0)
+                if (Y_pi < 0)
+                    n = 5;
+                else
+                    n = 1;
+                end
             end
         end
     end
@@ -147,6 +158,7 @@ function [n,rotado] = Num_Identification(im, rotar, mostrar)
           hold on;    plot(Cen(1),Cen(2),'*r')
           hold on;    plot(Pfc(1),Pfc(2),'*b')
           hold on;    text(10,20,num2str(Pf),'Color','r','BackgroundColor','g');
+          hold on;    plot(y(1),x(1),'*g');
           subplot(223); imshow(esqueleto);  title('esqueleto')
           subplot(224); imshow(esqueleto1); title('esqueleto1')
       
