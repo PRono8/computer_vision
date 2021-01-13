@@ -25,14 +25,14 @@ function [MSudokus,num_MSudokus] = sudoku(image)
             warning('Un Sudoku detectado incorrecto')
             continue
         end
-        
-        
-        
+
         % Detectar números (Mario)
         MaSudoku = get_numbers(squares,num_squares);
         
         % Se guarda en la estructura
         MSudokus(k).Matrix = MaSudoku;
+        
+        MSudokus(k).SolveMatrix = sudoku_solver(MSudokus(k).Matrix);
         
         % Número de Sudokus analizados
         num_MSudokus = num_sudokus+1;

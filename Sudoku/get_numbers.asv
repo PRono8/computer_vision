@@ -4,7 +4,7 @@ function [MSudoku] = get_numbers(square,num_squares)
         columna = 1;
         
         display1 = 0;
-        display2 = 0;
+        display2 = 1;
         
         rotado = 0; 
         rotar = 0;                      % Se inicializa a 0 para q compruebe si hay q rotar
@@ -25,7 +25,7 @@ function [MSudoku] = get_numbers(square,num_squares)
                     [num,rotado] = Num_Identification(im, rotar, display2);    % Sino, llamo a función
                     
                      MSudoku(fila,columna) = num;               % Guardo en matriz Sudoku
-                     
+                     %rotado = 1; % QUITAR!!!
                      switch rotado 
                          case 0
                              if num == 5 || num == 6 || num == 9
@@ -53,7 +53,7 @@ function [MSudoku] = get_numbers(square,num_squares)
                                  columna = columna-1;
                              elseif rotar == 0
                                  rotar = 3;
-                                 [MSudoku] = Control_rotado(i,square, Mrotacion, MSudoku);
+                                 [MSudoku] = Control_rotado(i,square, Mrotacion, MSudoku,display1,display2);
                                  % Revisar los núm anteriores
                              else
                                  warning('Sale invertido cuando no debe')
@@ -84,10 +84,10 @@ function [MSudoku] = get_numbers(square,num_squares)
         end
 end
 
-function [MSudoku] = Control_rotado(n, square, Mrotacion, MSudoku)
+function [MSudoku] = Control_rotado(n, square, Mrotacion, MSudoku,display1,display2)
     for i=1:n
-       fila = floor(i/9);
-       columna = mod(i,9);
+       fila = ceil(i/9);
+       columna = mod(i,10);
        
        if Mrotacion(fila,columna)==1
            [im,~,~] = empty_squares_detection(square{i},display1);

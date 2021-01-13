@@ -4,7 +4,7 @@ function [MSudoku] = get_numbers(square,num_squares)
         columna = 1;
         
         display1 = 0;
-        display2 = 0;
+        display2 = 1;
         
         rotado = 0; 
         rotar = 0;                      % Se inicializa a 0 para q compruebe si hay q rotar
@@ -25,10 +25,10 @@ function [MSudoku] = get_numbers(square,num_squares)
                     [num,rotado] = Num_Identification(im, rotar, display2);    % Sino, llamo a función
                     
                      MSudoku(fila,columna) = num;               % Guardo en matriz Sudoku
-                     
+                     %rotado = 1; % QUITAR!!!
                      switch rotado 
                          case 0
-                             if num == 5 || num == 6 || num == 9
+                             if num == 5 || num == 6 || num == 9 || num==7 || num==1
                                 Mrotacion(fila,columna) = 1;    % Se guarda como dudoso
                              else
                                 Mrotacion(fila,columna) = 0;    % Se guarda como seguro
@@ -53,7 +53,8 @@ function [MSudoku] = get_numbers(square,num_squares)
                                  columna = columna-1;
                              elseif rotar == 0
                                  rotar = 3;
-                                 [MSudoku] = Control_rotado(i,square, Mrotacion, MSudoku);
+                                 warning('Ha entrado en Control_rotado');
+                                 [MSudoku] = Control_rotado(i,square, Mrotacion, MSudoku,display1,display2);
                                  % Revisar los núm anteriores
                              else
                                  warning('Sale invertido cuando no debe')
@@ -84,27 +85,35 @@ function [MSudoku] = get_numbers(square,num_squares)
         end
 end
 
-function [MSudoku] = Control_rotado(n, square, Mrotacion, MSudoku)
+function [MSudoku] = Control_rotado(n, square, Mrotacion, MSudoku,display1,display2)
+    fila = 1;
+    columna = 1;
     for i=1:n
-       fila = floor(i/10);
-       columna = mod(i,10);
-       
        if Mrotacion(fila,columna)==1
            [im,~,~] = empty_squares_detection(square{i},display1);
            [num,~] = Num_Identification(im, 3, display2);
            MSudoku(fila,columna) = num;
        end
+       if(mod(i,9)==0)         % Por cada fila
+            columna = 1;
+            fila = fila+1;
+        else
+            columna = columna+1;
+        end
     end 
 end
 
 function [MSudoku] = Giro_matriz(rotar, A)
+    warning('Se gira la matriz...');
     switch rotar
         case 3      % Rotar 180º
-           MSudoku = [fliplr(A(3,:)) ;fliplr(A(2,:)) ;fliplr(A(1,:)) ];
+           MSudoku = [fliplr(A(9,:)) ;fliplr(A(8,:)) ;fliplr(A(7,:)) ;fliplr(A(6,:)) ;fliplr(A(5,:)) ;fliplr(A(4,:)) ;fliplr(A(3,:)) ;fliplr(A(2,:)) ;fliplr(A(1,:)) ];
+
+           
         case 4      % Rotar 90º
-           MSudoku = [A(:,3)' ;A(:,2)' ;A(:,1)' ];
+           MSudoku = [A(:,9)' ;A(:,8)' ;A(:,7)' ;A(:,6)' ;A(:,5)' ;A(:,4)' ;A(:,3)' ;A(:,2)' ;A(:,1)' ];
         case 5      % Rotar -90º
-           MSudoku = [A(3,:)' ,A(2,:)' ,A(1,:)' ];
+           MSudoku = [A(9,:)' ,A(8,:)' ,A(7,:)' ;A(6,:)' ,A(5,:)' ,A(4,:)' ;A(3,:)' ,A(2,:)' ,A(1,:)' ];
         otherwise
             warning('Entra en Giro_matriz erroneamente (rotar = 0||2)')
     end

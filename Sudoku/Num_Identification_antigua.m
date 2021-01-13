@@ -33,27 +33,29 @@ function [n,rotado] = Num_Identification(im, rotar, mostrar)
     
 %%%%%% PROPERTIES OBTENCION %%%%%%%
 
-%     im1 = bwmorph(im,'erode',1);           % Hace una erosión
-%     im2 = bwmorph(im1,'dilate',1);          % 4 dilataciones
+%     imh = histeq(im);                       % Mejora el contraste mediante la ecualización del histograma
+%     imbw = im2bw(imh,0.2);                  % Convertir imagen a imagen binaria, basada en umbral
+    imf = (im);                        % Inviwerte (para tener números en blanco)
+
+    im1 = bwmorph(imf,'erode',1);           % Hace una erosión
+    im2 = bwmorph(im1,'dilate',1);          % 4 dilataciones
     
-    esqueleto1 = bwmorph(im,'thin',inf);    % thin = adelagaza los objetos hasta líneas = esqueleto
     
-    esqueleto = bwskel(im);
-%     esqueleto = bwmorph(esqueleto,'dilate',1);
-%     esqueleto1 = bwmorph(esqueleto1,'dilate',1);
-%     esqueleto = bwmorph(esqueleto,'erode',1);
-%     esqueleto1 = bwmorph(esqueleto1,'erode',1);
-%     figure,
-%     subplot(151);
-%     imshow(im);
-%     subplot(152);
-%     imshow(im1);
-%     subplot(153);
-%     imshow(im2);
-%     subplot(154);
-%     imshow(esqueleto);
-%     subplot(155);
-%     imshow(esqueleto1);
+    
+    esqueleto = bwmorph(im1,'thin',inf);    % thin = adelagaza los objetos hasta líneas = esqueleto
+    
+    esqueleto1 = bwskel(im1);
+    figure,
+    subplot(151);
+    imshow(im);
+    subplot(152);
+    imshow(im1);
+    subplot(153);
+    imshow(im2);
+    subplot(154);
+    imshow(esqueleto);
+    subplot(155);
+    imshow(esqueleto1);
 
     % ROI = esqueleto(50:140, 30:260);      % Nos quedamos la región de interés deseada
     % im1 = bwlabel(ROI);                   % Etiqueta reg coneectadas
@@ -76,31 +78,17 @@ function [n,rotado] = Num_Identification(im, rotar, mostrar)
 
 
     X_pf = Cen(1)-Pfc(1);                   % Posición relativa en Y del primer punto final respecto al centroide
-    Y_pf = Cen(2)-Pfc(2);
-
-    area_im = size(im);
-    area_total = area_im(1)*area_im(2);
-    area_num = Area;
-    porcentaje = area_num*100/area_total
+    v = [Euler, Pf, Area, X_pf ];
 
     %%%%%% Clasificación de Números %%%%%%%
     
-    switch (Euler)                           % Separa (8), (0,6,9,4) y (1,2,3,5,7)
+    switch (v(1))                           % Separa (8), (0,6,9,4) y (1,2,3,5,7)
      case (-1)                              % Dos huecos
-        if (Pf==1)
-            if(X_pf<0)                      % Separa (6) y (9)
-                n = 6;                      % según centroide X
-            else                            % y punto final
-                n = 9;
-            end
-        elseif (Pf == 0)
-            n = 8;
-        else 
-            n = 4;
-        end
+        n = 8;
+
      case (0)                               % Un hueco
-        if (Pf==1)
-            if(X_pf<0)                      % Separa (6) y (9)
+        if (v(2)==1)
+            if(v(4)<0)                      % Separa (6) y (9)
                 n = 6;                      % según centroide X
             else                            % y punto final
                 n = 9;
@@ -110,48 +98,40 @@ function [n,rotado] = Num_Identification(im, rotar, mostrar)
         end
 
      case (1)                               % Cero huecos
-        if (Pf == 2)                  % 2 puntos finales
-            if (Area>0.5*area_total)
-                if (Y_pf > 0)
-                    if (X_pf > 0)
-                        n = 3;
-                    else
-                        n = 5;
-                    end
-                elseif (X_pf < 0)
-                    n = 2;
-                end
-            elseif (X_pf < 1)
-                n = 1;
+        if (v(2) == 4)                      % 4 ptos finales
+            n = 5;  
+        elseif (v(2) == 2)                  % 2 puntos finales
+            if (v(3)>6000)
+                n = 2;
             else
                 n = 7;
             end
-        end
-        if (Pf == 3)
-            n = 3;
+        elseif (v(2) == 3)                  % 3 puntos finales (1,3 y 7)
+            if (v(3) < 3000)
+                n = 1;                      % 3 => Y_pf positivo
+            elseif (v(4)<0)
+                n = 5;                      % área de 5
+            else
+                n = 3;
+            end
         end
     end
     
     if mostrar == 1
-          figure;
-          subplot(221); imshow(im);         title('original')
-          hold on
-          text(10,20,num2str(n),'Color','r','BackgroundColor','g');
-          subplot(222); imshow(ob1);        title('endpoints')
-          hold on;    plot(Cen(1),Cen(2),'*r')
-          hold on;    plot(Pfc(1),Pfc(2),'*b')
-          hold on;    text(10,20,num2str(Pf),'Color','r','BackgroundColor','g');
-          subplot(223); imshow(esqueleto);  title('esqueleto')
-          subplot(224); imshow(esqueleto1); title('esqueleto1')
+        figure;
+      subplot(221); imshow(im);         title('original')  
+      subplot(222); imshow(imf);        title ('binaria')
+      subplot(223); imshow(im2);        title('cerrada')
+      subplot(224); imshow(esqueleto);  title('esqueleto')
       
-%         figure;     imshow(ob1);        title('endpoints')
-%         hold on;    plot(Cen(1),Cen(2),'*r')
-%         hold on;    plot(Pfc(1),Pfc(2),'*b')
-%         hold on;    text(10,20,num2str(n),'Color','r','BackgroundColor','g');
+        figure;     imshow(ob1);        title('endpoints')
+        hold on;    plot(Cen(1),Cen(2),'*r')
+        hold on;    plot(Pfc(1),Pfc(2),'*b')
+        hold on;    text(10,20,num2str(n),'Color','r','BackgroundColor','g');
       
-%         figure; 
-%       imshow(im); hold on
-%       text(10,20,num2str(n),'Color','r','BackgroundColor','g');
+        figure; 
+      imshow(im); hold on
+      text(10,20,num2str(n),'Color','r','BackgroundColor','g');
     end
     
     if rotar == 0 && n ~= 0
@@ -166,10 +146,10 @@ function [n,rotado] = Num_Identification(im, rotar, mostrar)
         end
     end
     
-    if rotar == 2 && (n == 3 || n == 7)
+    if rotar == 2 && (n == 1 || n == 2 || n == 7)
         switch n
-            case 3
-                if X_pf < 0
+            case 1
+                if X_pf < -10
                     rotado = 3;
                 else
                     rotado = 1;
