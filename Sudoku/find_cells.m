@@ -1,21 +1,18 @@
 function [image_cell] = find_cells(img1,display)
 %% Resolucion identificacion cuadriculas transformada de hough
-%%Resolucion identificacion cuadriculas transformada de hough
 %% Lectura del fichero
-% Recortamos la imagen para trabajar sobre esta parte
 imR = imbinarize(img1,'adaptive','ForegroundPolarity','dark','Sensitivity',0.5);
 % imR = imbinarize(img1,'adaptive','ForegroundPolarity','dark','Sensitivity',0.6);
 
 
-%% Resolución mediante Sobel
-% Ahora lo realizamos mediante la función imfilter
+%% Aplicación filtro de Sobel
 imagenSobelH = imfilter(imR,fspecial('sobel'),'replicate');
 imagenSobelH = double(imagenSobelH);
 imagenSobelV = imfilter(imR,fspecial('sobel')','replicate');
 imagenSobelV = double(imagenSobelV);
 im2 = sqrt((imagenSobelH.^2)+(imagenSobelV.^2));
 
-%% Mejora de imagen edge + sobel 
+%% Mejora de imagen sobel con dilatacion
 if length(imR(1,:))>=250
     se = strel('line',0.01*length(img1(:,1)),0);
     BW2 = imdilate(im2,se);
@@ -26,13 +23,10 @@ end
 
 %% Busqueda de lineas en imagen
 imgedge=im2;
-
 %transformacion de hough
 [H,T,R] = hough(imgedge);
-
 %busqueda de peaks
 P  = houghpeaks(H,24,'threshold',ceil(0.3*max(H(:)))); x = T(P(:,2)); y = R(P(:,1)); %plot(x,y,'s','color','white');
-
 %busqueda de lineas
 lines = houghlines(imgedge,T,R,P,'FillGap',600,'MinLength',0.8*length(img1(:,1)));
 
