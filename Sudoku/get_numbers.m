@@ -60,15 +60,8 @@ function [MSudoku] = get_numbers(square,num_squares)
                                  warning('Sale invertido cuando no debe')
                              end
                      end
-%                 fila
-%                 columna
-%                 MSudoku
-                
                 
                 end
-                fila
-                columna
-                MSudoku
                 if(mod(i,9)==0)         % Por cada fila
                     columna = 1;
                     fila = fila+1;

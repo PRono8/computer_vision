@@ -37,6 +37,7 @@ function [MSudokus,num_MSudokus] = sudoku(image)
         % Número de Sudokus analizados
         num_MSudokus = num_sudokus+1;
     end
+    num_MSudokus = num_sudokus-1;
 end
 
 
