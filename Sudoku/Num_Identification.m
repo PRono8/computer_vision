@@ -86,7 +86,7 @@ function [n,rotado] = Num_Identification(im, rotar, mostrar)
     area_im = size(im);
     area_total = area_im(1)*area_im(2);
     area_num = Area;
-    porcentaje = area_num*100/area_total
+    porcentaje = area_num*100/area_total;
 
     %%%%%% Clasificación de Números %%%%%%%
     
