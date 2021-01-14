@@ -1,7 +1,7 @@
     %%Prueba global
 close all;
 % Se guarda la imagen en image
-i=2;
+i=7;
     s1 = string("image");
     s2 = string(i);
     s3 = string("=imread('Sudoku");
@@ -19,3 +19,17 @@ i=2;
             MSudokus(j).Matrix
         end
     end
+%%    %%Prueba global
+close all;
+% Se guarda la imagen en image
+i=7;
+image=imread('3.JPEG');
+[MSudokus,num_MSudokus] = sudoku(image);
+
+    
+    if(num_MSudokus > 0)
+        for j=1:num_MSudokus
+            MSudokus(j).Matrix
+        end
+    end
+

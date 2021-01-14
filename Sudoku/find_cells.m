@@ -3,8 +3,8 @@ function [image_cell] = find_cells(img1,display)
 %%Resolucion identificacion cuadriculas transformada de hough
 %% Lectura del fichero
 % Recortamos la imagen para trabajar sobre esta parte
-imR = imbinarize(img1,'adaptive','ForegroundPolarity','dark','Sensitivity',0.58);
-imR = imbinarize(img1,'adaptive','ForegroundPolarity','dark','Sensitivity',0.6);
+imR = imbinarize(img1,'adaptive','ForegroundPolarity','dark','Sensitivity',0.5);
+% imR = imbinarize(img1,'adaptive','ForegroundPolarity','dark','Sensitivity',0.6);
 
 
 %% Resolución mediante Sobel
@@ -31,16 +31,17 @@ imgedge=im2;
 [H,T,R] = hough(imgedge);
 
 %busqueda de peaks
-P  = houghpeaks(H,30,'threshold',ceil(0.3*max(H(:)))); x = T(P(:,2)); y = R(P(:,1)); %plot(x,y,'s','color','white');
+P  = houghpeaks(H,24,'threshold',ceil(0.3*max(H(:)))); x = T(P(:,2)); y = R(P(:,1)); %plot(x,y,'s','color','white');
 
 %busqueda de lineas
 lines = houghlines(imgedge,T,R,P,'FillGap',600,'MinLength',0.8*length(img1(:,1)));
 
 %eliminacion de lines diagonales
+margen_angulo=6;
 diagonales=[];
 cont=1;
 for i=1:length(lines)
-    if abs(abs(lines(i).theta)-90)>=15 && abs(lines(i).theta)>=15   
+    if abs(abs(lines(i).theta)-90)>=margen_angulo && abs(lines(i).theta)>=margen_angulo   
         diagonales(cont)=i;
         cont=cont+1;
     end
@@ -59,17 +60,66 @@ clear lines_vertical;
 contvertical=1;
 conthorizontal=1;
 for i=1:length(lines)
-    if abs(lines(i).theta-0)<= 10 %vertical
+    if abs(lines(i).theta-0)<= margen_angulo %vertical
         lines_vertical(contvertical)=lines(i);
         contvertical=contvertical+1;
     end
-    if abs(abs(lines(i).theta) - 90)<=10 %horizontal
+    if abs(abs(lines(i).theta) - 90)<=margen_angulo %horizontal
         lines_horizontal(conthorizontal)=lines(i);
         conthorizontal=conthorizontal+1;
 
     end    
 end
 
+
+%Angulo medio de horizontales y verticales
+ angmed_Vert=0;
+angmed_Horizont=0;
+for i=1:length(lines_vertical)
+    angmed_Vert=angmed_Vert+ abs(lines_vertical(i).theta);
+    
+end
+angmed_Vert=angmed_Vert/length(lines_vertical);
+
+
+for i=1:length(lines_horizontal)
+    angmed_Horizont=angmed_Horizont+abs(lines_horizontal(i).theta);
+end
+angmed_Horizont=angmed_Horizont/length(lines_horizontal);
+
+%Volvemos a eliminar diagonales, ahora sabiendo el valor medio
+angmed_Vert=abs(lines_vertical(2).theta);
+angmed_Horizont=abs(lines_horizontal(length(lines_horizontal)).theta);
+margen_angulo=margen_angulo;
+diagonales=[];
+cont=1;
+for i=1:length(lines_horizontal)
+    if abs(abs(lines_horizontal(i).theta)-angmed_Horizont)>=margen_angulo && abs(lines_horizontal(i).theta- angmed_Vert)>=margen_angulo   
+        diagonales(cont)=i;
+        cont=cont+1;
+    end
+end
+cont2=0;
+
+    for i=1:length(diagonales)
+        lines_horizontal(diagonales(i)-cont2)=[];
+        cont2=cont2+1;
+    end
+
+diagonales=[];
+cont=1;
+for i=1:length(lines_vertical)
+    if abs(abs(lines_vertical(i).theta)-90)>=margen_angulo && abs(lines_vertical(i).theta)>=margen_angulo   
+        diagonales(cont)=i;
+        cont=cont+1;
+    end
+end
+cont2=0;
+
+    for i=1:length(diagonales)
+        lines_vertical(diagonales(i)-cont2)=[];
+        cont2=cont2+1;
+    end
 %ordenar de menor a mayor horizontales y verticales
 
 for i=1:length(lines_vertical)-1
@@ -92,7 +142,7 @@ for i=1:length(lines_horizontal)-1
     end
 end
 
-%Eliminamos lineas que representan bordes
+% %Eliminamos lineas que representan bordes
 if length(lines_horizontal(:))==10
     lines_horizontal=lines_horizontal(2:length(lines_horizontal)-1);
 
@@ -100,18 +150,52 @@ end
 if length(lines_vertical(:))==10
     lines_vertical=lines_vertical(2:length(lines_vertical)-1);
 end
+
+
 if length(lines_horizontal(:))==9
+    abajo= lines_horizontal(length(lines_horizontal(:)));
+    arriba=lines_horizontal(1);
+    distancia_abajo= abs(length(imR(:,1))-abajo.point1(1));
+    distancia_arriba= abs(0 -arriba.point1(1));
+
+if distancia_abajo > distancia_arriba
     lines_horizontal=lines_horizontal(1:length(lines_horizontal)-1);
+else 
+    lines_horizontal=lines_horizontal(2:length(lines_horizontal));
 
 end
+end
+
+
 if length(lines_vertical(:))==9
+    derecha= lines_vertical(length(lines_vertical(:)));
+    izquierda=lines_vertical(1);
+    distancia_derecha= abs(length(imR(1,:))-derecha.point1(1));
+    distancia_izquierda=abs(0 -izquierda.point1(1));
+
+if distancia_derecha > distancia_izquierda
+    lines_vertical=lines_vertical(2:length(lines_vertical));
+
+else 
     lines_vertical=lines_vertical(1:length(lines_vertical)-1);
+
+
+end
+end
+flag=0;
+
+if length(lines_horizontal(:))~=8 || length(lines_vertical(:))~=8
+    image_cell=[];
+    disp('Warning: No se ha detectado Sudoku')
+    flag=1;
+
 end
 
 
 %%
 
 
+if flag==0
 
 max_len = 0;
 xmin=1000;
@@ -364,10 +448,11 @@ if length(lines_horizontal)~=8 || length(lines_vertical)~=8
     disp('Warning: No se ha detectado Sudoku')
 end
 
-
+end
 %%
 
-if display==1
+if flag==0 && display==1
+    
   
     figure(1)
     title('Imagen binarizada')
