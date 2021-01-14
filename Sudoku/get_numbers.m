@@ -4,7 +4,7 @@ function [MSudoku] = get_numbers(square,num_squares)
         columna = 1;
         
         display1 = 0;
-        display2 = 1;
+        display2 = 0;
         
         rotado = 0; 
         rotar = 0;                      % Se inicializa a 0 para q compruebe si hay q rotar

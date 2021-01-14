@@ -16,7 +16,7 @@ function [MSudokus,num_MSudokus] = sudoku(image)
         % Función casillas (Marta y Jorge)
         %[squares,num_squares] = find_cells(ImSudokus(k).Image);
         img = imcomplement(ImSudokus(k).Image);
-        squares = find_cells(img,0);
+        squares = find_cells(img,1);
         
         num_squares = length(squares);
  

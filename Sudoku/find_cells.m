@@ -4,6 +4,8 @@ function [image_cell] = find_cells(img1,display)
 %% Lectura del fichero
 % Recortamos la imagen para trabajar sobre esta parte
 imR = imbinarize(img1,'adaptive','ForegroundPolarity','dark','Sensitivity',0.58);
+imR = imbinarize(img1,'adaptive','ForegroundPolarity','dark','Sensitivity',0.6);
+
 
 %% Resolución mediante Sobel
 % Ahora lo realizamos mediante la función imfilter
@@ -29,7 +31,7 @@ imgedge=im2;
 [H,T,R] = hough(imgedge);
 
 %busqueda de peaks
-P  = houghpeaks(H,24,'threshold',ceil(0.3*max(H(:)))); x = T(P(:,2)); y = R(P(:,1)); %plot(x,y,'s','color','white');
+P  = houghpeaks(H,30,'threshold',ceil(0.3*max(H(:)))); x = T(P(:,2)); y = R(P(:,1)); %plot(x,y,'s','color','white');
 
 %busqueda de lineas
 lines = houghlines(imgedge,T,R,P,'FillGap',600,'MinLength',0.8*length(img1(:,1)));
@@ -199,13 +201,13 @@ image_cell=cell(n,1);
 contPoints=1;
 for i=1:8
     %fila 1
-    image_cell{i}=imR(yi:crossingpoints(contPoints,2),xi:crossingpoints(contPoints,1));
+    image_cell{i}=imR(ceil(yi):ceil(crossingpoints(contPoints,2)),ceil(xi):ceil(crossingpoints(contPoints,1))); 
     yi=lines_vertical(i).point1(2);
     xi=crossingpoints(contPoints,1);
     contPoints=contPoints+1;
 end
 i=i+1;
-image_cell{i}=imR(yi:crossingpoints(contPoints-1,2),xi:lines_horizontal(1).point2(1));
+image_cell{i}=imR(ceil(yi):ceil(crossingpoints(contPoints-1,2)),ceil(xi):ceil(lines_horizontal(1).point2(1)));
 
 xi=lines_horizontal(1).point1(1);
 yi=crossingpoints(1,2);
@@ -213,14 +215,14 @@ yi=crossingpoints(1,2);
 for i=10:17
     %fila 2
     ylast=yi;
-    image_cell{i}=imR(yi:crossingpoints(contPoints,2),xi:crossingpoints(contPoints,1)); 
+    image_cell{i}=imR(ceil(yi):ceil(crossingpoints(contPoints,2)),ceil(xi):ceil(crossingpoints(contPoints,1))); 
     yi=crossingpoints(contPoints-8,2);
     xi=crossingpoints(contPoints,1);
     contPoints=contPoints+1;
 
 end 
 i=i+1;
-image_cell{i}=imR(ylast:crossingpoints(contPoints-1,2),xi:lines_horizontal(2).point2(1));
+image_cell{i}=imR(ceil(ylast):ceil(crossingpoints(contPoints-1,2)),ceil(xi):ceil(lines_horizontal(2).point2(1)));
 
 xi=lines_horizontal(2).point1(1);
 
@@ -230,7 +232,9 @@ for i=19:26
     %fila 3
     ylast=yi;
     xlast=xi;
-    image_cell{i}=imR(yi:crossingpoints(contPoints,2),xi:crossingpoints(contPoints,1));
+    %image_cell{i}=imR(yi:crossingpoints(contPoints,2),xi:crossingpoints(contPoints,1));
+    image_cell{i}=imR(ceil(yi):ceil(crossingpoints(contPoints,2)),ceil(xi):ceil(crossingpoints(contPoints,1))); 
+
     yi=crossingpoints(contPoints-8,2);
     xi=crossingpoints(contPoints,1);
     contPoints=contPoints+1;
@@ -238,7 +242,7 @@ for i=19:26
 end 
 
 i=i+1;
-image_cell{i}=imR(ylast:crossingpoints(contPoints-1,2),xi:lines_horizontal(3).point2(1));
+image_cell{i}=imR(ceil(ylast):ceil(crossingpoints(contPoints-1,2)),ceil(xi):ceil(lines_horizontal(3).point2(1)));
 
 xi=lines_horizontal(3).point1(1);
 
@@ -247,7 +251,7 @@ for i=28:35
     %fila 4
         ylast=yi;
 
-    image_cell{i}=imR(yi:crossingpoints(contPoints,2),xi:crossingpoints(contPoints,1));
+    image_cell{i}=imR(ceil(yi):ceil(crossingpoints(contPoints,2)),ceil(xi):ceil(crossingpoints(contPoints,1))); 
     yi=crossingpoints(contPoints-8,2);
 
     xi=crossingpoints(contPoints,1);
@@ -255,7 +259,7 @@ for i=28:35
 
 end 
 i=i+1;
-image_cell{i}=imR(ylast:crossingpoints(contPoints-1,2),xi:lines_horizontal(4).point2(1));
+image_cell{i}=imR(ceil(ylast):ceil(crossingpoints(contPoints-1,2)),ceil(xi):ceil(lines_horizontal(4).point2(1)));
 
 xi=lines_horizontal(4).point1(1);
 
@@ -264,7 +268,7 @@ for i=37:44
     %fila 5
     ylast=yi;
 
-    image_cell{i}=imR(yi:crossingpoints(contPoints,2),xi:crossingpoints(contPoints,1));
+    image_cell{i}=imR(ceil(yi):ceil(crossingpoints(contPoints,2)),ceil(xi):ceil(crossingpoints(contPoints,1))); 
 
     yi=crossingpoints(contPoints-8,2);
 
@@ -273,7 +277,7 @@ for i=37:44
 
 end 
 i=i+1;
-image_cell{i}=imR(ylast:crossingpoints(contPoints-1,2),xi:lines_horizontal(5).point2(1));
+image_cell{i}=imR(ceil(ylast):ceil(crossingpoints(contPoints-1,2)),ceil(xi):ceil(lines_horizontal(5).point2(1)));
 
 xi=lines_horizontal(5).point1(1);
 
@@ -282,7 +286,7 @@ for i=46:53
     %fila 6
         ylast=yi;
 
-    image_cell{i}=imR(yi:crossingpoints(contPoints,2),xi:crossingpoints(contPoints,1));
+    image_cell{i}=imR(ceil(yi):ceil(crossingpoints(contPoints,2)),ceil(xi):ceil(crossingpoints(contPoints,1))); 
 
     yi=crossingpoints(contPoints-8,2);
 
@@ -291,9 +295,9 @@ for i=46:53
 
 end 
 i=i+1;
-image_cell{i}=imR(ylast:crossingpoints(contPoints-1,2),xi:lines_horizontal(6).point2(1));
+image_cell{i}=imR(ceil(ylast):ceil(crossingpoints(contPoints-1,2)),ceil(xi):ceil(lines_horizontal(6).point2(1)));
 
-xi=lines_horizontal(6).point1(1);;
+xi=lines_horizontal(6).point1(1);
 
 yi=crossingpoints(41,2);
 
@@ -301,7 +305,7 @@ for i=55:62
     %fila 7
         ylast=yi;
 
-    image_cell{i}=imR(yi:crossingpoints(contPoints,2),xi:crossingpoints(contPoints,1));
+    image_cell{i}=imR(ceil(yi):ceil(crossingpoints(contPoints,2)),ceil(xi):ceil(crossingpoints(contPoints,1))); 
 
     yi=crossingpoints(contPoints-8,2);
 
@@ -310,7 +314,8 @@ for i=55:62
 
 end 
 i=i+1;
-image_cell{i}=imR(ylast:crossingpoints(contPoints-1,2),xi:lines_horizontal(7).point2(1));
+%image_cell{i}=imR(ylast:crossingpoints(contPoints-1,2),xi:lines_horizontal(7).point2(1));
+image_cell{i}=imR(ceil(ylast):ceil(crossingpoints(contPoints-1,2)),ceil(xi):ceil(lines_horizontal(7).point2(1)));
 
 xi=lines_horizontal(7).point1(1);
 
@@ -320,7 +325,7 @@ for i=64:71
         ylast=yi;
 
     
-    image_cell{i}=imR(yi:crossingpoints(contPoints,2),xi:crossingpoints(contPoints,1));
+    image_cell{i}=imR(ceil(yi):ceil(crossingpoints(contPoints,2)),ceil(xi):ceil(crossingpoints(contPoints,1))); 
     yi=crossingpoints(contPoints-8,2);
 
 
@@ -329,7 +334,7 @@ for i=64:71
 
 end 
 i=i+1;
-image_cell{i}=imR(ylast:crossingpoints(contPoints-1,2),xi:lines_horizontal(8).point2(1));
+image_cell{i}=imR(ceil(ylast):ceil(crossingpoints(contPoints-1,2)),ceil(xi):ceil(lines_horizontal(8).point2(1)));
 
 xi=lines_horizontal(8).point1(1);
 
@@ -340,7 +345,7 @@ for i=73:80
     
     ylast=yi;
 
-    image_cell{i}=imR(yi:lines_vertical(i-72).point2(2),xi:crossingpoints(contPoints,1));
+    image_cell{i}=imR(ceil(yi):ceil(lines_vertical(i-72).point2(2)),ceil(xi):ceil(crossingpoints(contPoints,1))); 
 
     yi=crossingpoints(contPoints,2);
 
@@ -350,7 +355,7 @@ for i=73:80
 
 end 
 i=i+1;
-image_cell{i}=imR(yi:lines_vertical(8).point2(2),xi:lines_horizontal(8).point2(1));
+image_cell{i}=imR(ceil(yi):ceil(lines_vertical(8).point2(2)),ceil(xi):ceil(lines_horizontal(8).point2(1)));
 end
 
 
@@ -360,6 +365,7 @@ if length(lines_horizontal)~=8 || length(lines_vertical)~=8
 end
 
 
+%%
 
 if display==1
   
