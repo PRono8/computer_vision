@@ -479,8 +479,10 @@ if display==1 % flag==0 && display==1
         plot(xy(2,1),xy(2,2),'x','LineWidth',2,'Color','red');    
         hold on
     end
+    if flag==0
     for i=1: length(crossingpoints(:,1))
         plot(crossingpoints(i,1),crossingpoints(i,2),'x','LineWidth',4,'Color','blue');
+    end
     end
     figure
 for i=1:81
