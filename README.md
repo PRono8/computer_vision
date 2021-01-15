@@ -1,13 +1,13 @@
 # computer_vision
  
 
-In this repository is the code developed for an identification application 
-of Sudokus for academic purposes due to a work in the Computer Vision 
-subject of the University Master's Degree in Automation and Robotics of the Polytechnic University of Madrid.
+In this repository yo can find the code developed for a Sudoku solver using Computer Vision techniques.
+This work has been developed within the framework of the Computer Vision course, belonging to the  Master's Degree
+in Automation and Robotics of the Polytechnic University of Madrid.
 
-It is developed in Matlab and is organized as follows:
+It is developed in Matlab and it's organized as follows:
 
- - Inside the Sudoku Benchmark folder, there are the captured images of the sudokus of different spanish brands.
+ - Inside the Sudoku Benchmark folder, you can find the captured images of the Sudokus.
 
  - On the other hand, the application code is in the Code folder, which contains different Matlab files:
      
@@ -19,15 +19,15 @@ It is developed in Matlab and is organized as follows:
      
      - find_cells.m: function which detects each of the cells of the square segmented by the find_sudoku function.
      
-     - get_numbers.m: main function of identification of numbers, which, in addition to returning the 
-        identified number, detects whether it is rotated or not, and does so.
+     - get_numbers.m: main function of the program used for number identification. In addition to returning the 
+        identified number, it detects whether it is rotated or not, and corrects it. 
        
         - empty_squares_detection.m: subfunction which filters each cell obtained from the find_cells function, 
           and identifies if there is a number or not, to send it to the get_number function.
         
         - Num_identification.m: subfunction which identifies which number is in each case.
 
-     - sudoku_solver.m: function implemented by Cleve Moler in MathWorks, which solves the sudoku puzzle 
-         from a matrix with the unsolved sudoku numbers.
+     - sudoku_solver.m: function implemented by Cleve Moler in MathWorks, which solves the Sudoku puzzle 
+         from a matrix containing the unsolved Sudoku.
 
      - SudokuSolver.mlapp: graphic user interface in order to make our code easier to use and understand its results.
