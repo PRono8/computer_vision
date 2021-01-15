@@ -1,7 +1,7 @@
 # computer_vision
  
 
-In this repository yo can find the code developed for a Sudoku solver using Computer Vision techniques.
+In this repository you can find the code developed for a Sudoku solver using Computer Vision techniques.
 This work has been developed within the framework of the Computer Vision course, belonging to the  Master's Degree
 in Automation and Robotics of the Polytechnic University of Madrid.
 
