@@ -101,8 +101,6 @@ function [MSudoku] = Giro_matriz(rotar, A)
     switch rotar
         case 3      % Rotar 180º
            MSudoku = [fliplr(A(9,:)) ;fliplr(A(8,:)) ;fliplr(A(7,:)) ;fliplr(A(6,:)) ;fliplr(A(5,:)) ;fliplr(A(4,:)) ;fliplr(A(3,:)) ;fliplr(A(2,:)) ;fliplr(A(1,:)) ];
-
-           
         case 4      % Rotar 90º
            MSudoku = [A(:,9)' ;A(:,8)' ;A(:,7)' ;A(:,6)' ;A(:,5)' ;A(:,4)' ;A(:,3)' ;A(:,2)' ;A(:,1)' ];
         case 5      % Rotar -90º

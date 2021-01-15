@@ -1,5 +1,5 @@
 %% Testeo
-img1=imread('3.jpeg');
+img1=imread('1.jpeg');
 
 [a,b]=find_sudoku(img1);
 img1=imcomplement(a.Image);

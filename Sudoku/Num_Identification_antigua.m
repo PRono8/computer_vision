@@ -1,4 +1,4 @@
-function [n,rotado] = Num_Identification(im, rotar, mostrar)
+function [n,rotado] = Num_Identification_antigua(im, rotar, mostrar)
 
 %%% VARIABLES DE LA FUNCIÓN:
     % rotado: Te dice si detecta el número rotado

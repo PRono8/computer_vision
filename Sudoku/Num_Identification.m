@@ -117,6 +117,22 @@ function [n,rotado] = Num_Identification(im, rotar, mostrar)
                 n = 7;
             end
         elseif (Pf == 3)
+%             if (Y_pf < 0)
+%                 if (Y_pi < 0)
+%                     n = 5;
+%                 elseif (X_pi>1)
+%                     n = 1;
+%                 else
+%                     n = 4;
+%                 end
+%             elseif (Y_pi<0)
+%                 n = 3;
+%             else
+%                 n = 5;
+%             end
+%         else
+%             n = 4;
+%         end
             if (X_pf > 0)
                 n = 3;
             elseif (Y_pf < 0)
