@@ -8,7 +8,7 @@ function [MSudokus,num_MSudokus] = sudoku(image)
     
     MSudokus(1).Matrix = zeros(9); 
     
-    for k=1:num_sudokus
+    for k=1%1:num_sudokus
         
         MSudoku = zeros(9,9);
         MaSudoku = zeros(9);

@@ -26,20 +26,30 @@ i=7;
 image=imread('1.JPEG');
 [MSudokus,num_MSudokus] = sudoku(image);
 %% 
+close all
 
-figure
+imagefondo=imread('plantilla.jpeg');
+figure (25)
+factor_cambio_x=length(imagefondo(:,1,1))/18;
+factor_cambio_y=length(imagefondo(1,:,1))/18;
+
+axis([0 length(imagefondo(:,1)) 0 length(imagefondo(:,1))]);
+axis ij;
+axis off;
+imshow(imagefondo), hold on;
  %imagesc(MSudokus.Matrix)  
  a=MSudokus;
-axis([0 10 0 10]);
-axis ij;
-for i=1:length(a.Matrix)
-    for j=1:length(a.Matrix)
+
+for i=1:length(a(1).Matrix)
+    for j=1:length(a(1).Matrix)
 
    % [x,y]=ind2sub(i,j)
 
-    text(j,i,num2str(a.Matrix(i,j)))
+    text(j*factor_cambio_x+2*contx,i*factor_cambio_y+2*conty,num2str(a(1).Matrix(i,j)),'FontSize',12)
+    contx=contx+1;
     end
 end
+title('Number Extraction','FontSize',14)
 %     if(num_MSudokus > 0)
 %         for j=1:num_MSudokus
 %             MSudokus(j).Matrix
