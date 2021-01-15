@@ -23,13 +23,22 @@ i=7;
 close all;
 % Se guarda la imagen en image
 i=7;
-image=imread('3.JPEG');
+image=imread('1.JPEG');
 [MSudokus,num_MSudokus] = sudoku(image);
 
-    
-    if(num_MSudokus > 0)
-        for j=1:num_MSudokus
-            MSudokus(j).Matrix
-        end
-    end
+figure
+ %imagesc(MSudokus.Matrix)  
+ a=MSudokus;
+axis([0 9 0 9]);
+for b=1:numel(a)
+
+[x,y]=ind2sub(size(a),b)
+
+text(x,y,num2str(a(b)))
+end
+%     if(num_MSudokus > 0)
+%         for j=1:num_MSudokus
+%             MSudokus(j).Matrix
+%         end
+%     end
 

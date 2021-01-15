@@ -1,8 +1,8 @@
 %% Testeo
-img1=imread('Sudoku4.jpeg');
+img1=imread('3.jpeg');
 
-[a,b]=find_squares(img1);
-img1=imcomplement(a.Image1);
+[a,b]=find_sudoku(img1);
+img1=imcomplement(a.Image);
 
 image_cell=find_cells(img1,1);
 %% Plot Image

@@ -8,7 +8,7 @@ function [squares,num_squares] = find_sudoku(image)
     
     display1 = 0;
     display2 = 0;
-    display3 = 1;
+    display3 = 0;
 
     %% Preprocessed
 
