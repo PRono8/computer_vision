@@ -23,7 +23,7 @@ i=7;
 close all;
 % Se guarda la imagen en image
 i=7;
-image=imread('Sudoku9.JPG');
+image=imread('1.JPEG');
 [MSudokus,num_MSudokus] = sudoku(image);
 %% 
 
@@ -32,16 +32,14 @@ figure
  a=MSudokus;
 axis([0 10 0 10]);
 axis ij;
-axis off;
-for i=1:length(a(1).Matrix)
-    for j=1:length(a(1).Matrix)
+for i=1:length(a.Matrix)
+    for j=1:length(a.Matrix)
 
    % [x,y]=ind2sub(i,j)
 
-    text(j,i,num2str(a(1).Matrix(i,j)),'FontSize',12)
+    text(j,i,num2str(a.Matrix(i,j)))
     end
 end
-title('Number Extraction','FontSize',14)
 %     if(num_MSudokus > 0)
 %         for j=1:num_MSudokus
 %             MSudokus(j).Matrix

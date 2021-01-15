@@ -2,7 +2,7 @@ function [image_cell] = find_cells(img1,display)
 %% Resolucion identificacion cuadriculas transformada de hough
 %% Lectura del fichero
 imR = imbinarize(img1,'adaptive','ForegroundPolarity','dark','Sensitivity',0.5);
-% imR = imbinarize(img1,'adaptive','ForegroundPolarity','dark','Sensitivity',0.6);
+%imR = imbinarize(img1,'adaptive','ForegroundPolarity','dark','Sensitivity',0.6);
 
 
 %% Aplicación filtro de Sobel
@@ -448,15 +448,16 @@ end
 if flag==0 && display==1
     
   
-    figure(1)
-    title('Imagen binarizada')
-    imshow(imR)
+    figure
+    imshow(img1)
 
-    figure(2)
+    title('Extracted Sudoku','FontSize',14)
+
+    figure
     imshow(im2);
-    title('Resultado con función imfilter(fspecial(sobel))+ Dilatación')
+    title('Filtered Image','FontSize',14)
 
-    figure(3)
+    figure
 	imshow(imR), hold on 
 
     for k = 1:length(lines)   
@@ -470,7 +471,7 @@ if flag==0 && display==1
     for i=1: length(crossingpoints(:,1))
         plot(crossingpoints(i,1),crossingpoints(i,2),'x','LineWidth',4,'Color','blue');
     end
-    figure(4)
+    figure
 for i=1:81
     subplot(9,9,i)
     imshow(image_cell{i})
