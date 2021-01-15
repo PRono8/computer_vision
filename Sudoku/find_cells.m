@@ -23,6 +23,7 @@ end
 
 %% Busqueda de lineas en imagen
 imgedge=im2;
+image_cell=[];
 %transformacion de hough
 [H,T,R] = hough(imgedge);
 %busqueda de peaks
