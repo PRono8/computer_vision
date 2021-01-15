@@ -32,32 +32,16 @@ function [n,rotado] = Num_Identification(im, rotar, mostrar)
     end
     
 %%%%%% PROPERTIES OBTENCION %%%%%%%
+%     im = bwmorph(im,'close',1);
 
-%     im1 = bwmorph(im,'erode',1);           % Hace una erosión
-%     im2 = bwmorph(im1,'dilate',1);          % 4 dilataciones
+    area_im = size(im);
+    area_total = area_im(1)*area_im(2);
     
-    esqueleto1 = bwmorph(im,'thin',inf);    % thin = adelagaza los objetos hasta líneas = esqueleto
-    
+    P = round(0.1*area_total);
+    im = bwareaopen(im,P,4);
+
+    esqueleto1 = bwmorph(im,'thin',inf);     % thin = adelagaza los objetos hasta líneas = esqueleto
     esqueleto = bwskel(im);
-%     esqueleto = bwmorph(esqueleto,'dilate',1);
-%     esqueleto1 = bwmorph(esqueleto1,'dilate',1);
-%     esqueleto = bwmorph(esqueleto,'erode',1);
-%     esqueleto1 = bwmorph(esqueleto1,'erode',1);
-%     figure,
-%     subplot(151);
-%     imshow(im);
-%     subplot(152);
-%     imshow(im1);
-%     subplot(153);
-%     imshow(im2);
-%     subplot(154);
-%     imshow(esqueleto);
-%     subplot(155);
-%     imshow(esqueleto1);
-
-    % ROI = esqueleto(50:140, 30:260);      % Nos quedamos la región de interés deseada
-    % im1 = bwlabel(ROI);                   % Etiqueta reg coneectadas
-
     p = regionprops(esqueleto,'ConvexArea', 'EulerNumber', 'Centroid');   % Sacamos las propiedades
 
     ob1 = bwmorph(esqueleto,'endpoints');   % Sacamos los puntos finales
@@ -83,14 +67,11 @@ function [n,rotado] = Num_Identification(im, rotar, mostrar)
     X_pi = Cen(1)-y(1);
     Y_pi = Cen(2)-x(1);
 
-    area_im = size(im);
-    area_total = area_im(1)*area_im(2);
-    area_num = Area;
-    porcentaje = area_num*100/area_total;
+    porcentaje = Area*100/area_total;
 
     %%%%%% Clasificación de Números %%%%%%%
     
-    switch (Euler)                           % Separa (8), (0,6,9,4) y (1,2,3,5,7)
+    switch (Euler)                          % Separa (8), (0,6,9,4) y (1,2,3,5,7)
      case (-1)                              % Dos huecos
         if (Pf==1)
             if(X_pf<0)                      % Separa (6) y (9)
@@ -105,9 +86,9 @@ function [n,rotado] = Num_Identification(im, rotar, mostrar)
         end
      case (0)                               % Un hueco
         if (Pf==1)
-            if(X_pf<0 && Y_pf>0)                      % Separa (6) y (9)
+            if(X_pf<0 && Y_pf>0)            % Separa (6) y (9)
                 n = 6;                      % según centroide X
-            elseif (X_pf >0)                            % y punto final
+            elseif (X_pf >-5)                % y punto final
                 n = 9;
             else
                 n = 4;
@@ -117,8 +98,8 @@ function [n,rotado] = Num_Identification(im, rotar, mostrar)
         end
 
      case (1)                               % Cero huecos
-        if (Pf == 2)                  % 2 puntos finales
-            if (Area>0.5*area_total)
+        if (Pf == 2)                        % 2 puntos finales
+            if (Area>0.45*area_total)
                 if (Y_pf > 0)
                     if (X_pf > 0)
                         n = 3;
@@ -135,8 +116,23 @@ function [n,rotado] = Num_Identification(im, rotar, mostrar)
             else
                 n = 7;
             end
-        end
-        if (Pf == 3)
+        elseif (Pf == 3)
+%             if (Y_pf < 0)
+%                 if (Y_pi < 0)
+%                     n = 5;
+%                 elseif (X_pi>1)
+%                     n = 1;
+%                 else
+%                     n = 4;
+%                 end
+%             elseif (Y_pi<0)
+%                 n = 3;
+%             else
+%                 n = 5;
+%             end
+%         else
+%             n = 4;
+%         end
             if (X_pf > 0)
                 n = 3;
             elseif (Y_pf < 0)
@@ -145,8 +141,13 @@ function [n,rotado] = Num_Identification(im, rotar, mostrar)
                 else
                     n = 1;
                 end
+            elseif (Y_pi<5 && Y_pi>-5)
+                n = 5;
+            else
+                n = 7;
             end
         end
+            
     end
     
     if mostrar == 1
@@ -162,14 +163,6 @@ function [n,rotado] = Num_Identification(im, rotar, mostrar)
           subplot(223); imshow(esqueleto);  title('esqueleto')
           subplot(224); imshow(esqueleto1); title('esqueleto1')
       
-%         figure;     imshow(ob1);        title('endpoints')
-%         hold on;    plot(Cen(1),Cen(2),'*r')
-%         hold on;    plot(Pfc(1),Pfc(2),'*b')
-%         hold on;    text(10,20,num2str(n),'Color','r','BackgroundColor','g');
-      
-%         figure; 
-%       imshow(im); hold on
-%       text(10,20,num2str(n),'Color','r','BackgroundColor','g');
     end
     
     if rotar == 0 && n ~= 0
@@ -180,7 +173,7 @@ function [n,rotado] = Num_Identification(im, rotar, mostrar)
         if ancho > alto
             rotado = 2;
         else
-            rotar  = 2;      % Para comprobar si está invertido
+            rotar  = 2;                     % Para comprobar si está invertido
         end
     end
     
@@ -192,20 +185,23 @@ function [n,rotado] = Num_Identification(im, rotar, mostrar)
                 else
                     rotado = 1;
                 end
-            case 2
-                Y_pf = Cen(2)-Pfc(2);
-                if Y_pf > -50
-                    rotado = 3;
-                else
-                    rotado = 1;
-                end
-            case 7
-                if X_pf < 0
-                    rotado = 3;
-                else
-                    rotado = 1;  
-                end
         end
     end
-end
+    end
 
+% if (Y_pf < 0)
+%                 if (Y_pi < 0)
+%                     n = 5;
+%                 elseif (X_pi>1)
+%                     n = 1;
+%                 else
+%                     n = 4;
+%                 end
+%             elseif (Y_pi<0)
+%                 n = 3;
+%             else
+%                 n = 5;
+%             end
+%         else
+%             n = 4;
+%         end

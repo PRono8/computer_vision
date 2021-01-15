@@ -477,7 +477,7 @@ for i=1:81
     imshow(image_cell{i})
     
 end
-suptitle('Cell Division')
+% suptitle('Cell Division')
 
 end    
 
