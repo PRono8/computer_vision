@@ -53,19 +53,30 @@ clear lines_vertical;
 %Separar en Horizontales y verticales
 contvertical=1;
 conthorizontal=1;
+flag_horizontal=0;
+flag_vertical=0;
+
 for i=1:length(lines)
     if abs(lines(i).theta-0)<= margen_angulo %vertical
         lines_vertical(contvertical)=lines(i);
         contvertical=contvertical+1;
+        flag_vertical=1;
     end
     if abs(abs(lines(i).theta) - 90)<=margen_angulo %horizontal
         lines_horizontal(conthorizontal)=lines(i);
         conthorizontal=conthorizontal+1;
+        flag_horizontal=1;
 
     end    
 end
+flag=0;
+if flag_vertical==0 || flag_horizontal==0
+    disp('Warning: Unable to find lines. ')
+    image_cell=[];
+    flag=1;
+end
 
-
+if flag==0
 %Angulo medio de horizontales y verticales
  angmed_Vert=0;
 angmed_Horizont=0;
@@ -184,7 +195,7 @@ if length(lines_horizontal(:))~=8 || length(lines_vertical(:))~=8
     flag=1;
 
 end
-
+end
 
 %%
 
@@ -445,7 +456,7 @@ end
 end
 %%
 
-if flag==0 && display==1
+if display==1 % flag==0 && display==1
     
   
     figure

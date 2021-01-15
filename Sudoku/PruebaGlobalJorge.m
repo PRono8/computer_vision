@@ -23,10 +23,10 @@ i=7;
 close all;
 % Se guarda la imagen en image
 i=7;
-image=imread('4.JPEG');
+image=imread('C:\Users\jorge\OneDrive\Documentos\GitHub\computer_vision\Sudokus\SudokuSudoku\Sudoku5.JPG');
 [MSudokus,num_MSudokus] = sudoku(image);
 %% 
-close all
+%close all
 
 imagefondo=imread('plantilla.jpeg');
 figure (25)
