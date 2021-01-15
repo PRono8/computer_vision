@@ -8,7 +8,7 @@ function [MSudokus,num_MSudokus] = sudoku(image)
     
     MSudokus(1).Matrix = zeros(9); 
     
-    for k=1%1:num_sudokus
+    for k=1:num_sudokus
         
         MSudoku = zeros(9,9);
         MaSudoku = zeros(9);
@@ -32,7 +32,7 @@ function [MSudokus,num_MSudokus] = sudoku(image)
         % Se guarda en la estructura
         MSudokus(k).Matrix = MaSudoku;
         
-        MSudokus(k).SolveMatrix = sudoku_solver(MSudokus(k).Matrix);
+       MSudokus(k).SolveMatrix = sudoku_solver(MSudokus(k).Matrix);
         
         % Número de Sudokus analizados
         num_MSudokus = num_sudokus+1;
